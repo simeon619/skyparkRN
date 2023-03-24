@@ -1,0 +1,53 @@
+import { FlashList } from '@shopify/flash-list';
+import React, { useEffect, useState } from 'react';
+import { Animated, Dimensions, SafeAreaView, StyleSheet } from 'react-native';
+import { NativeScrollEvent } from 'react-native/Libraries/Components/ScrollView/ScrollView';
+import { NativeSyntheticEvent } from 'react-native/Libraries/Types/CoreEventTypes';
+import Postcomponent from '../../components/Post/Postcomponent';
+import { POST_DATA } from '../../posts';
+import { RATIO_HEADER } from '../../utils/metric';
+const { width, height } = Dimensions.get('window');
+const Market = ({ scrollY }: { scrollY: Animated.Value }) => {
+  let HEADER_HEIGHT = (RATIO_HEADER * height) / 100;
+  const [refreshing, setRefreshing] = useState(false);
+  useEffect(() => {
+    if (refreshing) {
+      //fetch data
+      setRefreshing(false);
+    }
+  }, [refreshing]);
+  return (
+    <SafeAreaView style={styles.main}>
+      <FlashList
+        data={POST_DATA}
+        estimatedItemSize={10}
+        bounces={true}
+        contentContainerStyle={{
+          paddingTop: HEADER_HEIGHT,
+          paddingBottom: 20,
+        }}
+        refreshing={refreshing}
+        showsVerticalScrollIndicator={false}
+        onRefresh={() => setRefreshing(true)}
+        //   onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
+        //     scrollY.setValue(e.nativeEvent.contentOffset.y);
+        //   }}
+        onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
+          scrollY.setValue(e.nativeEvent.contentOffset.y);
+        }}
+        scrollEventThrottle={16}
+        // extraData={}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => <Postcomponent posts={item} key={item.id} />}
+      />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+    // backgroundColor: COLORS.white,
+  },
+});
+export default Market;
