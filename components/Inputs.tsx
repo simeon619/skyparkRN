@@ -1,3 +1,4 @@
+import React from 'react';
 import { useController } from 'react-hook-form';
 import { Image, StyleSheet, Text, TextInput, View } from 'react-native';
 import { COLORS } from '../themes/colors';

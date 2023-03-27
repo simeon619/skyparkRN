@@ -4,7 +4,9 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { BottomTabs } from './components/BottomTabs/BottomTabs';
 import DrawerNavigator from './components/Drawer/Drawernavigator';
+import Activity from './screen/Activity';
 import { Home } from './screen/Home/Home';
+import ItemActivity from './screen/ItemActivity';
 import { LogoStart } from './screen/LogoStart';
 import { Infoperso } from './screen/register/Infoperso';
 import { Infoprofile } from './screen/register/Infoprofile';
@@ -26,6 +28,8 @@ const Start = () => {
           <Stack.Screen name="logostart" component={LogoStart} />
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Activity" component={Activity} />
+          <Stack.Screen name="ItemActivity" component={ItemActivity} />
           <Stack.Screen name="Infoperso" component={Infoperso} />
           <Stack.Screen name="Infoprofile" component={Infoprofile} />
           <Stack.Screen name="drawer" component={DrawerNavigator} />

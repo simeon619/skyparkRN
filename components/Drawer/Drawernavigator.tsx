@@ -85,11 +85,11 @@ function DrawerNavigator() {
       />
 
       <Drawer.Screen
-        name="Activity"
+        name="Market"
         component={Login}
         options={{
-          title: 'Activity',
-          drawerLabel: () => ( <Text style={{ fontSize: 22, color: 'black', fontFamily :'Roboto-Regular' }}>Activity</Text> ),
+          title: 'Market',
+          drawerLabel: () => ( <Text style={{ fontSize: 22, color: 'black', fontFamily :'Roboto-Regular' }}>Market</Text> ),
           drawerIcon: ({ color, size, focused }) => (
             <Image
               style={{

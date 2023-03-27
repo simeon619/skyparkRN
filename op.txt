@@ -1,53 +1,115 @@
-import { FlashList } from '@shopify/flash-list';
-import React, { useEffect, useState } from 'react';
-import { Animated, Dimensions, SafeAreaView, StyleSheet } from 'react-native';
-import { NativeScrollEvent } from 'react-native/Libraries/Components/ScrollView/ScrollView';
-import { NativeSyntheticEvent } from 'react-native/Libraries/Types/CoreEventTypes';
-import Postcomponent from '../../components/Post/Postcomponent';
-import { POST_DATA } from '../../posts';
-import { RATIO_HEADER } from '../../utils/metric';
-const { width, height } = Dimensions.get('window');
-const Market = ({ scrollY }: { scrollY: Animated.Value }) => {
-  let HEADER_HEIGHT = (RATIO_HEADER * height) / 100;
-  const [refreshing, setRefreshing] = useState(false);
-  useEffect(() => {
-    if (refreshing) {
-      //fetch data
-      setRefreshing(false);
-    }
-  }, [refreshing]);
-  return (
-    <SafeAreaView style={styles.main}>
-      <FlashList
-        data={POST_DATA}
-        estimatedItemSize={10}
-        bounces={true}
-        contentContainerStyle={{
-          paddingTop: HEADER_HEIGHT,
-          paddingBottom: 20,
-        }}
-        refreshing={refreshing}
-        showsVerticalScrollIndicator={false}
-        onRefresh={() => setRefreshing(true)}
-        //   onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
-        //     scrollY.setValue(e.nativeEvent.contentOffset.y);
-        //   }}
-        onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
-          scrollY.setValue(e.nativeEvent.contentOffset.y);
-        }}
-        scrollEventThrottle={16}
-        // extraData={}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => <Postcomponent posts={item} key={item.id} />}
-      />
-    </SafeAreaView>
-  );
+Il est possible d'optimiser davantage le code que j'ai proposé en utilisant des "worklets" de React Native Reanimated. Les "worklets" sont des fonctions qui s'exécutent sur le thread natif, ce qui peut améliorer encore plus les performances de l'animation.
+
+Voici le code réécrit en utilisant des "worklets" :
+
+import { useAnimatedScrollHandler, useSharedValue, interpolate, Extrapolate, useAnimatedStyle, runOnUI } from 'react-native-reanimated';
+
+const scrollY = useSharedValue(0);
+const HEADER_HEIGHT = (RATIO_HEADER * height) / 100;
+
+const handleScrollHeader = useAnimatedScrollHandler((event) => {
+scrollY.value = event.contentOffset.y;
+runOnUI(() => {
+// Mettre à jour l'état de l'en-tête dans le thread JS
+// La fonction est exécutée sur le thread natif via "worklet"
+updateHeaderState(scrollY.value);
+})();
+});
+
+// Mettre à jour l'état de l'en-tête dans le thread JS
+// La fonction est exécutée sur le thread JS
+const updateHeaderState = (scrollYValue) => {
+const diffClampValue = interpolate(scrollYValue, [0, HEADER_HEIGHT], [0, -HEADER_HEIGHT / 1.6], Extrapolate.CLAMP);
+headerY.value = diffClampValue;
 };
 
-const styles = StyleSheet.create({
-  main: {
-    flex: 1,
-    // backgroundColor: COLORS.white,
-  },
+const headerY = useSharedValue(0);
+const headerStyle = useAnimatedStyle(() => ({
+transform: [{ translateY: headerY.value }],
+}));
+
+return (
+<>
+<Animated.View
+style={[
+{
+position: 'absolute',
+backgroundColor: '#ffffffee',
+elevation: 1,
+left: 0,
+right: 0,
+top: 0,
+minHeight: HEADER_HEIGHT,
+zIndex: 2,
+maxHeight: 150,
+},
+headerStyle,
+]}
+/>
+<FlashList
+key={1}
+data={POST_DATA}
+estimatedItemSize={height / 2.3}
+refreshing={refreshing}
+contentContainerStyle={{ paddingTop: HEADER_HEIGHT, paddingBottom: 20 }}
+onScroll={handleScrollHeader}
+keyExtractor={(item) => item.id}
+renderItem={({ item }) => <Postcomponent posts={item} key={item.id} />}
+/>
+</>
+);
+
+En utilisant des "worklets", la fonction updateHeaderState est exécutée sur le thread JS pour mettre à jour l'état de l'en-tête, tandis que le reste de la logique est exécutée sur le thread natif, ce qui peut améliorer encore plus les performances de l'animation
+
+
+
+
+
+
+
+
+
+
+import { useAnimatedScrollHandler, useSharedValue, interpolate, Extrapolate, useAnimatedStyle } from 'react-native-reanimated';
+
+const scrollY = useSharedValue(0);
+const HEADER_HEIGHT = (RATIO_HEADER * height) / 100;
+const handleScrollHeader = useAnimatedScrollHandler((event) => {
+scrollY.value = event.contentOffset.y;
 });
-export default Market;
+
+const diffClamp = interpolate(scrollY.value, [0, HEADER_HEIGHT], [0, -HEADER_HEIGHT / 1.6], Extrapolate.CLAMP);
+const headerStyle = useAnimatedStyle(() => ({
+transform: [{ translateY: diffClamp }],
+}));
+
+return (
+<>
+<Animated.View
+style={[
+{
+position: 'absolute',
+backgroundColor: '#ffffffee',
+elevation: 1,
+left: 0,
+right: 0,
+top: 0,
+minHeight: HEADER_HEIGHT,
+zIndex: 2,
+maxHeight: 150,
+},
+headerStyle,
+]}
+/>
+<FlashList
+key={1}
+data={POST_DATA}
+estimatedItemSize={height / 2.3}
+refreshing={refreshing}
+contentContainerStyle={{ paddingTop: HEADER_HEIGHT, paddingBottom: 20 }}
+onScroll={handleScrollHeader}
+keyExtractor={(item) => item.id}
+renderItem={({ item }) => <Postcomponent posts={item} key={item.id} />}
+/>
+</>
+);

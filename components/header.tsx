@@ -1,16 +1,20 @@
+import React from 'react';
 import {
   Dimensions,
   Image,
   Pressable,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { COLORS } from '../themes/colors';
 import { RATIO_HEADER } from '../utils/metric';
 
 const { width, height } = Dimensions.get('window');
-export const Header = ({ navigation, page, onbtn1, onbtn2 }: any) => {
+export const Header = ({ navigation, page, onSwitchPage }: {
+  navigation : any , page : number , onSwitchPage :(index: number) => void 
+}) => {
   const toggleDrawer = () => {
     navigation.toggleDrawer();
   };
@@ -40,13 +44,14 @@ export const Header = ({ navigation, page, onbtn1, onbtn2 }: any) => {
           style={{ alignSelf: 'flex-start' }}></Pressable>
       </View>
       <View style={styles.bottomHeader}>
-        <Pressable onPress={onbtn1}>
+        <TouchableOpacity onPress={() => onSwitchPage(0)}>
           <Text
             style={[
               {
                 fontSize: 20,
                 color: '#aaa',
                 fontWeight: '600',
+                fontFamily: 'Ubuntu-Regular',
                 paddingBottom: 8,
               },
               page === 0
@@ -54,13 +59,14 @@ export const Header = ({ navigation, page, onbtn1, onbtn2 }: any) => {
                     borderBottomWidth: 3,
                     borderBottomColor: COLORS.blue,
                     color: COLORS.black,
+                    fontWeight: '700',
                   }
                 : {},
             ]}>
-            News
+            Building
           </Text>
-        </Pressable>
-        <Pressable onPress={onbtn2}>
+        </TouchableOpacity>
+        <Pressable onPress={() => onSwitchPage(1)}>
           <Text
             style={[
               {
@@ -68,16 +74,18 @@ export const Header = ({ navigation, page, onbtn1, onbtn2 }: any) => {
                 color: '#aaa',
                 fontWeight: '600',
                 paddingBottom: 8,
+                fontFamily: 'Ubuntu-Regular',
               },
               page === 1
                 ? {
                     borderBottomColor: COLORS.blue,
                     borderBottomWidth: 3,
+                    fontWeight: '700',
                     color: COLORS.black,
                   }
                 : {},
             ]}>
-            MarketPlace
+            Neighborhood
           </Text>
         </Pressable>
       </View>

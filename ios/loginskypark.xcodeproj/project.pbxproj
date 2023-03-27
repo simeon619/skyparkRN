@@ -22,6 +22,10 @@
 		3A19A9B2944C4B52BE1C787E /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 63A07F822C794208AF31C6C6 /* Roboto-Light.ttf */; };
 		40521625BDF14882A8462DE2 /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 91C7EEDF70D84FC395CABEFC /* Roboto-Medium.ttf */; };
 		11743F18D77847F58A42E74C /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F075178BE2BE40D0AE2ECAC0 /* Roboto-Regular.ttf */; };
+		83EBD87548CF4ED68D2FB474 /* Ubuntu-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8311D61AE94C49EB89A20570 /* Ubuntu-Bold.ttf */; };
+		5616D3BA0CAF48ACBF9008A0 /* Ubuntu-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 72901C9E5E3D4B3D8FF1C5E1 /* Ubuntu-Light.ttf */; };
+		3DA6524457D3427FBBEFFB13 /* Ubuntu-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A321E8EAAB7248878714CBE0 /* Ubuntu-LightItalic.ttf */; };
+		C5A3A68C2E93458D8B102C69 /* Ubuntu-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4523B57D15194CCD864D82DE /* Ubuntu-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +64,10 @@
 		63A07F822C794208AF31C6C6 /* Roboto-Light.ttf */ = {isa = PBXFileReference; name = "Roboto-Light.ttf"; path = "../assets/fonts/Roboto-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		91C7EEDF70D84FC395CABEFC /* Roboto-Medium.ttf */ = {isa = PBXFileReference; name = "Roboto-Medium.ttf"; path = "../assets/fonts/Roboto-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		F075178BE2BE40D0AE2ECAC0 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; name = "Roboto-Regular.ttf"; path = "../assets/fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		8311D61AE94C49EB89A20570 /* Ubuntu-Bold.ttf */ = {isa = PBXFileReference; name = "Ubuntu-Bold.ttf"; path = "../assets/fonts/Ubuntu-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		72901C9E5E3D4B3D8FF1C5E1 /* Ubuntu-Light.ttf */ = {isa = PBXFileReference; name = "Ubuntu-Light.ttf"; path = "../assets/fonts/Ubuntu-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		A321E8EAAB7248878714CBE0 /* Ubuntu-LightItalic.ttf */ = {isa = PBXFileReference; name = "Ubuntu-LightItalic.ttf"; path = "../assets/fonts/Ubuntu-LightItalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		4523B57D15194CCD864D82DE /* Ubuntu-Regular.ttf */ = {isa = PBXFileReference; name = "Ubuntu-Regular.ttf"; path = "../assets/fonts/Ubuntu-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -176,6 +184,10 @@
 				63A07F822C794208AF31C6C6 /* Roboto-Light.ttf */,
 				91C7EEDF70D84FC395CABEFC /* Roboto-Medium.ttf */,
 				F075178BE2BE40D0AE2ECAC0 /* Roboto-Regular.ttf */,
+				8311D61AE94C49EB89A20570 /* Ubuntu-Bold.ttf */,
+				72901C9E5E3D4B3D8FF1C5E1 /* Ubuntu-Light.ttf */,
+				A321E8EAAB7248878714CBE0 /* Ubuntu-LightItalic.ttf */,
+				4523B57D15194CCD864D82DE /* Ubuntu-Regular.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -285,6 +297,10 @@
 				3A19A9B2944C4B52BE1C787E /* Roboto-Light.ttf in Resources */,
 				40521625BDF14882A8462DE2 /* Roboto-Medium.ttf in Resources */,
 				11743F18D77847F58A42E74C /* Roboto-Regular.ttf in Resources */,
+				83EBD87548CF4ED68D2FB474 /* Ubuntu-Bold.ttf in Resources */,
+				5616D3BA0CAF48ACBF9008A0 /* Ubuntu-Light.ttf in Resources */,
+				3DA6524457D3427FBBEFFB13 /* Ubuntu-LightItalic.ttf in Resources */,
+				C5A3A68C2E93458D8B102C69 /* Ubuntu-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

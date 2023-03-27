@@ -37,3 +37,4 @@ export type PostList = {
 };
 
 export const POST_DATA: PostSchema[] = createRandomPosts(19)
+export const POST_DATA2: PostSchema[] = createRandomPosts(19)

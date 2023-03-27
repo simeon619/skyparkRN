@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import React, { memo, useState } from 'react';
 import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
 import { PostSchema } from '../../posts';
 import PostImages from './PostImages';
@@ -22,17 +22,18 @@ const PostComponent = (props: PostListProps) => {
           <View style={styles.infoUser}>
             <Image
               style={{
-                height: 30,
-                width: 30,
+                height: 40,
+                width: 40,
+                borderRadius : 99
               }}
               source={uri ? { uri } : require('../../assets/images/user.png')}
               resizeMode={'contain'}
             />
             <View>
-              <Text style={{ color: 'black', fontSize: 16 }}>
+              <Text style={{ color: 'black', fontSize: 16, fontWeight: '800', fontFamily : 'Ubuntu-Regular', }}>
                 {posts.author.name}
               </Text>
-              <Text style={{ color: 'black', fontSize: 11 }}>
+              <Text style={{ color: 'black', fontSize: 11 ,fontWeight: '100',fontFamily : 'Ubuntu-Regular' }}>
                 {new Date(timePost).getUTCHours()} h.
               </Text>
             </View>
@@ -40,8 +41,9 @@ const PostComponent = (props: PostListProps) => {
           <View style={styles.settingsPost}>
             <Text
               style={{
-                color: 'black',
-                fontSize: 20,
+                color: 'grey',
+                fontSize: 22,
+                alignSelf : 'center',
                 fontWeight: '900',
                 letterSpacing: 2,
               }}>
@@ -52,12 +54,12 @@ const PostComponent = (props: PostListProps) => {
         <View style={{ backgroundColor: 'white', paddingHorizontal: 7 }}>
           <Text
             style={{
-              color: 'black',
-              fontSize: 15,
-              fontWeight: '400',
+              color: '#001',
+              fontSize: 14,
+              fontFamily : 'Ubuntu-Light',
               marginVertical: 7,
             }}>
-            {posts.content.toString()} .
+            {posts.content.toString()}.
           </Text>
         </View>
         <View>
@@ -68,49 +70,54 @@ const PostComponent = (props: PostListProps) => {
           <View style={styles.statsPost}>
             <View style={styles.stats}>
               <Image
-                style={styles.like}
+                style={{
+                  width: 20,
+                  height: 20,
+                }}
                 source={require('../../assets/images/like.png')}
               />
               <Text style={styles.stats1}>{likes}</Text>
             </View>
             <View style={styles.stats}>
               <View style={styles.stats}>
-                <Image
+                {/* <Image
                   style={styles.like}
                   source={require('../../assets/images/comment1.png')}
-                />
-                <Text style={styles.stats1}>{likes}</Text>
+                /> */}
+                <Text style={styles.Textstats}>{likes}</Text>
+                <Text style={styles.Textstats} >comments .</Text>
               </View>
               <View style={styles.stats}>
-                <Image
+                {/* <Image
                   style={styles.like}
                   source={require('../../assets/images/share1.png')}
-                />
-                <Text style={styles.stats1}>{likes}</Text>
+                /> */}
+                <Text style={styles.Textstats}>{likes}</Text>
+                <Text style={styles.Textstats}>Shares</Text>
               </View>
             </View>
           </View>
           <View style={styles.interactPost}>
             <View style={styles.stats}>
               <Image
-                style={styles.like}
+                style={styles.Ilike}
                 source={require('../../assets/images/like2.png')}
               />
               <Text style={styles.stats1}>Like</Text>
             </View>
             <View style={styles.stats}>
               <Image
-                style={styles.like}
+                style={styles.Ilike}
                 source={require('../../assets/images/comment1.png')}
               />
               <Text style={styles.stats1}>Comment</Text>
             </View>
             <View style={styles.stats}>
               <Image
-                style={styles.like}
+                style={styles.Ilike}
                 source={require('../../assets/images/share1.png')}
               />
-              <Text style={styles.stats1}>Partagez</Text>
+              <Text style={styles.stats1}>Share</Text>
             </View>
           </View>
         </View>
@@ -121,11 +128,18 @@ const PostComponent = (props: PostListProps) => {
 
 const styles = StyleSheet.create({
   like: {
-    width: 19,
-    height: 19,
+    width: 15,
+    height: 15,
+    tintColor : 'grey'
   },
-  stats: { flexDirection: 'row', gap: 5, alignItems: 'center' },
-  stats1 :{ fontSize: 18, fontWeight: '500' , color : 'black'},
+  Textstats :{fontSize: 14 , color : '#999' , fontFamily : 'Ubuntu-Regular'},
+  Ilike: {
+    width: 18,
+    height: 18,
+    tintColor : '#999'
+  },
+  stats: { flexDirection: 'row', gap: 6, alignItems: 'center' },
+  stats1 :{ fontSize: 18 , color : '#999' , fontFamily : 'Ubuntu-Regular'},
   postHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -139,7 +153,7 @@ const styles = StyleSheet.create({
   },
   settingsPost: {},
   statsPost: {
-    borderBottomColor: '#0008',
+    borderBottomColor: '#0003',
     borderBottomWidth: 0.8,
     paddingVertical: 5,
     flexDirection: 'row',
@@ -148,8 +162,8 @@ const styles = StyleSheet.create({
   interactPost: {
     paddingVertical: 6,
     flexDirection: 'row',
-    gap: 20,
-    justifyContent: 'center',
+    // gap: 20,
+    justifyContent: 'space-around',
   },
 
   postFooter: {

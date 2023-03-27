@@ -48,12 +48,15 @@ const styles = StyleSheet.create({
   },
   textwelcome: {
     fontSize: 30,
-    color: '#345',
+    color: COLORS.blue,
     bottom: 15,
+    fontFamily: 'Kurale-Regular',
   },
   forgetpsswd: {
     alignSelf: 'center',
     color: COLORS.blue,
+    fontSize: 15,
+    fontFamily: 'Kurale-Regular',
     textDecorationLine: 'underline',
     fontWeight: '800',
     position: 'absolute',

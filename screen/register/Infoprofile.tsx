@@ -76,15 +76,15 @@ export const Infoprofile = (props: any) => {
       <View style={styles.AddressContain}>
         <Animated.View style={styles.room}>
           <Text style={styles.valueAdress}>28</Text>
-          <Text style={styles.titleAdress}>Room</Text>
+          <Text style={styles.titleAdress}>Flat</Text>
         </Animated.View>
         <View style={styles.door}>
           <Text style={styles.valueAdress}>78</Text>
-          <Text style={styles.titleAdress}>Door</Text>
+          <Text style={styles.titleAdress}>Entrance</Text>
         </View>
         <Animated.View style={styles.stair}>
           <Text style={styles.valueAdress}>16</Text>
-          <Text style={styles.titleAdress}>Stairs</Text>
+          <Text style={styles.titleAdress}>Floor</Text>
         </Animated.View>
       </View>
 

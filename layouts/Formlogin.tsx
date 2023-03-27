@@ -1,9 +1,10 @@
-import {yupResolver} from '@hookform/resolvers/yup';
-import React from 'react';
-import {useForm} from 'react-hook-form';
-import {StyleSheet, Text, View} from 'react-native';
+import { yupResolver } from '@hookform/resolvers/yup';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { StyleSheet, Text, View } from 'react-native';
 import * as yup from 'yup';
-import {Input} from '../components/Inputs';
+import { Input } from '../components/Inputs';
+//import SQuery from '../utils/squery/SQueryClient';
 
 type formSchema = {
   email: string;
@@ -15,25 +16,54 @@ const validationSchema = yup
     email: yup
       .string()
       .matches(
-        new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/i),
+        new RegExp(
+          /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/i,
+        ),
         'Veuillez saisir une adresse email valide',
       )
       .required('Veuillez saisir une adresse email'),
     password: yup
       .string()
-      .min(6, 'Doit fait au moins six caracteres')
+      .min(2, 'Doit fait au moins deux caracteres')
       .required('Mot de passe est requis'),
   })
   .required();
 
-const FormLogin = ({navigation}: {navigation?: any}) => {
+const FormLogin = ({ navigation }: { navigation?: any }) => {
   const {
     control,
     handleSubmit,
-    formState: {errors, isValid},
+    formState: { errors, isValid },
   } = useForm<formSchema>({
     resolver: yupResolver(validationSchema),
   });
+  const [dataLogin, setDataLogin] = useState<{
+    modelPath: string;
+    id: string;
+  }>();
+  // function sendServer(data: formSchema) {
+  //   SQuery.emitLater('login:user', data, async (res: any) => {
+  //     if (res.error) return console.log(JSON.stringify(res));
+
+  //     const data = {
+  //       modelPath: 'account',
+  //       id: res.response.loginId,
+  //     };
+  //     let model = await SQuery.Model('account');
+  //     let account = await model.instance({
+  //       id: res.response.loginId,
+  //     });
+  //     let name = await account['name']
+  //     // console.log(account.when());
+      
+  //     account.when('refresh:name' , (name :string)=>{
+  //       console.log(name);
+  //     })
+  //     console.log(name);
+  //     account['name'] = 'GREGROIRE';
+  //   });
+  // }
+
   return (
     <View style={styles.form}>
       <Input
@@ -48,15 +78,13 @@ const FormLogin = ({navigation}: {navigation?: any}) => {
         icon={0}
         placeholder="saisissez votre mot de passe"
       />
-    
+
       <View style={styles.btnConnexion}>
         <Text
-          onPress={handleSubmit(() => {
-            console.log('oops');
-          })}
+          // onPress={handleSubmit(sendServer)}
           style={[
             styles.textConnexion,
-            !isValid && {backgroundColor: '#12347add'},
+            !isValid && { backgroundColor: '#12347add' },
           ]}>
           LOG IN
         </Text>
@@ -69,11 +97,9 @@ const FormLogin = ({navigation}: {navigation?: any}) => {
           onPress={() => {
             navigation.navigate('Infoperso');
           }}>
-          {' '}
-          INSCRIPTION{' '}
+          click here
         </Text>
       </View>
-     
     </View>
   );
 };
@@ -86,19 +112,26 @@ const styles = StyleSheet.create({
   gotoregister: {
     flexDirection: 'row',
     marginTop: 20,
+    gap: 10,
+    alignItems: 'center',
   },
 
-  simple: {},
+  simple: {
+    fontFamily: 'Kurale-Regular',
+    fontSize: 18,
+  },
   link: {
     color: 'rgb(12 74 110)',
     fontWeight: '900',
     textDecorationLine: 'underline',
+    fontFamily: 'Kurale-Regular',
+    fontSize: 16,
   },
 
   btnConnexion: {
     marginTop: 10,
     width: '100%',
-    alignItems : 'center'
+    alignItems: 'center',
   },
   textConnexion: {
     backgroundColor: 'rgb(12 74 110)',
@@ -106,6 +139,7 @@ const styles = StyleSheet.create({
     borderRadius: 90,
     color: '#fff',
     width: '55%',
+
     paddingVertical: 5,
     textAlign: 'center',
   },
@@ -117,7 +151,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     backgroundColor: '#aa061266',
   },
-
 });
 
 export default FormLogin;

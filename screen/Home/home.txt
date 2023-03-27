@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Easing } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { useEffect, useState } from 'react';
 
 import {
   Animated,
@@ -9,37 +9,46 @@ import {
   SafeAreaView,
   StyleSheet,
 } from 'react-native';
+import {
+  Extrapolate,
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import Swiper from 'react-native-swiper';
 import { Header } from '../../components/header';
-import Thread from '../../components/Thread';
-import { POST_DATA, POST_DATA2 } from '../../posts';
+import Postcomponent from '../../components/Post/Postcomponent';
+import { POST_DATA } from '../../posts';
 import { RATIO_HEADER } from '../../utils/metric';
 
 const { width, height } = Dimensions.get('window');
 export const Home = ({ navigation }: any) => {
-  const scrollY = new Animated.Value(0, {
-    useNativeDriver: true,
+  const scrollY = useSharedValue(0);
+  const HEADER_HEIGHT = (RATIO_HEADER * height) / 100;
+
+  const handleScrollHeader = useAnimatedScrollHandler(event => {
+    scrollY.value = event.contentOffset.y;
   });
+  const diffClamp = interpolate(
+    withSpring(scrollY.value),
+    [0, HEADER_HEIGHT],
+    [0, -HEADER_HEIGHT / 1.6],
+    Extrapolate.CLAMP,
+  );
+  const headerStyle = 
+  useAnimatedStyle(() => ({
+    transform: [{ translateY: diffClamp }],
+  }));
 
-  let HEADER_HEIGHT = (RATIO_HEADER * height) / 100;
-
-  const diffClamp = Animated.diffClamp(scrollY, 0, HEADER_HEIGHT);
-
-  const headerY = diffClamp.interpolate({
-    inputRange: [0, HEADER_HEIGHT],
-    outputRange: [0, -HEADER_HEIGHT / 1.8],
-    extrapolate: "clamp",
-    // easing: Easing.bounce
-  });
-
-  const swiperRef = useRef<Swiper>(null);
   const [page, setPage] = useState(0);
 
-
-  const onSwitchPage = (index: number) => {
-    if (swiperRef.current) {
-      swiperRef.current.scrollTo(index);
-    }
+  const fnPage1 = () => {
+    setPage(0);
+  };
+  const fnPage2 = () => {
+    setPage(1);
   };
   const [refreshing, setRefreshing] = useState(false);
 
@@ -49,10 +58,9 @@ export const Home = ({ navigation }: any) => {
       setRefreshing(false);
     }
   }, [refreshing]);
-
-  const handleScrollHeader = (e: number) => {
-    scrollY.setValue(e);
-  };
+  // const handleScrollHeader = (e: number) => {
+  //   scrollY.setValue(e);
+  // };
 
   return (
     <SafeAreaView style={styles.main}>
@@ -79,44 +87,79 @@ export const Home = ({ navigation }: any) => {
         style={[
           {
             position: 'absolute',
-            backgroundColor: '#eeeeeeee',
-            elevation: 10,
+            backgroundColor: '#ffffffee',
+            elevation: 1,
             left: 0,
             right: 0,
             top: 0,
             minHeight: HEADER_HEIGHT, /// au lieu de jouer avec le header joue avec le flex
             zIndex: 2,
             maxHeight: 150,
-            transform: [{ translateY: headerY }],
           },
+          headerStyle,
         ]}>
         <Header
           navigation={navigation}
           page={page}
-          onSwitchPage={onSwitchPage}
+          onbtn1={fnPage1}
+          onbtn2={fnPage2}
         />
       </Animated.View>
       <Swiper
         style={styles.wrapper}
         loop={false}
-        ref={swiperRef}
         bounces={false}
-        // index={page}
+          ref// pense a utiliser pour regler le probleme d'index
+        index={page}
         showsPagination={false}
         onIndexChanged={i => setPage(i)}>
         {/* news */}
-        <Thread
-          POST_DATA={POST_DATA}
-          handleScrollHeader={handleScrollHeader}
+        <FlashList
+          key={1}
+          data={POST_DATA}
+          estimatedItemSize={height / 2.3}
+          bounces={true}
           refreshing={refreshing}
-          setRefreshing={setRefreshing}
+          contentContainerStyle={{
+            paddingTop: HEADER_HEIGHT,
+            paddingBottom: 20,
+          }}
+          showsVerticalScrollIndicator={false}
+          onRefresh={() => setRefreshing(true)}
+          // onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
+          //   handleScrollHeader(e.nativeEvent.contentOffset.y);
+          // }}
+          onScroll={handleScrollHeader}
+          scrollEventThrottle={16}
+          // extraData={}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <Postcomponent posts={item} key={item.id} />
+          )}
         />
         {/* Market */}
-        <Thread
-          POST_DATA={POST_DATA2}
-          handleScrollHeader={handleScrollHeader}
+        <FlashList
+          key={2}
+          data={POST_DATA}
+          estimatedItemSize={height / 2.3}
+          bounces={true}
           refreshing={refreshing}
-          setRefreshing={setRefreshing}
+          contentContainerStyle={{
+            paddingTop: HEADER_HEIGHT,
+            paddingBottom: 20,
+          }}
+          showsVerticalScrollIndicator={false}
+          onRefresh={() => setRefreshing(true)}
+          // onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
+          //   handleScrollHeader(e.nativeEvent.contentOffset.y);
+          // }}
+          onScroll={handleScrollHeader}
+          scrollEventThrottle={16}
+          // extraData={}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <Postcomponent posts={item} key={item.id} />
+          )}
         />
       </Swiper>
     </SafeAreaView>

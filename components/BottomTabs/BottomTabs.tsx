@@ -1,11 +1,12 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
-import Community from '../../screen/Community';
+
 import Conversation from '../../screen/Conversation';
 import { Home } from '../../screen/Home/Home';
 import Notification from '../../screen/Notification';
 import Search from '../../screen/Search';
+import ItemActivity from '../../screen/ItemActivity';
 
 const Tab = createBottomTabNavigator();
 export const BottomTabs = () => {
@@ -53,16 +54,16 @@ export const BottomTabs = () => {
         }}
       />
       <Tab.Screen
-        name="Community"
-        component={Community}
+        name="Activity"
+        component={ItemActivity}
         options={{
           tabBarIcon: ({ focused, color, size }) => {
             return (
               <Image
                 source={
                   focused
-                    ? require('../../assets/images/community_active.png')
-                    : require('../../assets/images/community_inactive.png')
+                    ? require('../../assets/images/activity_active.png')
+                    : require('../../assets/images/activity_inactive.png')
                 }
                 style={{ width: size, height: size }}
               />

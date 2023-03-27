@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { COLORS } from '../themes/colors';
@@ -5,7 +6,7 @@ import { COLORS } from '../themes/colors';
 export const LogoStart = ({ navigation }: any) => {
   useEffect(() => {
     const time = setTimeout(() => {
-      navigation.replace('Infoprofile');
+      navigation.replace('Login');
     }, 2000);
 
     return () => {
@@ -14,11 +15,6 @@ export const LogoStart = ({ navigation }: any) => {
   });
   return (
     <View style={styles.container}>
-      {/* <Image
-        source={require('../assets/images/svg1_login.jpg')}
-        style={{ width: 300, height: 300 }}
-        fadeDuration={100}
-      /> */}
              <Text
           style={{
             fontSize: 65,

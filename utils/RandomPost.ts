@@ -40,7 +40,7 @@ export function createRandomPosts(numberOfPosts: number): PostSchema[] {
       author: {
         name: 'John Smith',
         picture:
-          'https://fr.seaicons.com/wp-content/uploads/2015/11/Users-User-icon.png',
+          'https://images.pexels.com/photos/14737533/pexels-photo-14737533.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
         id: randomAuthorId,
       },
       type: 'image',
