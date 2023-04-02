@@ -55,7 +55,7 @@ export const Header = ({ navigation , page, onSwitchPage }: {
               },
               page === 0
                 ? {
-                    borderBottomWidth: 3,
+                    borderBottomWidth: 4,
                     borderBottomColor: COLORS.blue,
                     color: COLORS.black,
                     fontWeight: '700',
@@ -78,7 +78,7 @@ export const Header = ({ navigation , page, onSwitchPage }: {
               page === 1
                 ? {
                     borderBottomColor: COLORS.blue,
-                    borderBottomWidth: 3,
+                    borderBottomWidth: 4,
                     fontWeight: '700',
                     color: COLORS.black,
                   }

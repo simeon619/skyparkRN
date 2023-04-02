@@ -9,7 +9,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import Swiper from 'react-native-swiper';
+import PagerView from 'react-native-pager-view';
 import { useSelector } from 'react-redux';
 import { Header } from '../../components/header';
 import PostModal from '../../components/PostModal';
@@ -34,11 +34,11 @@ export const Home = ({ navigation }: any) => {
     // easing: Easing.bounce
   });
 
-  const swiperRef = useRef<Swiper>(null);
+  const swiperRef = useRef<PagerView>(null);
   const [page, setPage] = useState(0);
   const onSwitchPage = (index: number) => {
     if (swiperRef.current) {
-      swiperRef.current.scrollTo(index);
+      swiperRef.current.setPage(index);
     }
   };
   const [refreshing, setRefreshing] = useState(false);
@@ -102,15 +102,18 @@ export const Home = ({ navigation }: any) => {
             onSwitchPage={onSwitchPage}
           />
         </Animated.View>
-        <Swiper
+        <PagerView
           style={styles.wrapper}
-          loop={false}
+          initialPage={0}
+          pageMargin ={19}
           ref={swiperRef}
-          bounces={false}
-          showsPagination={false}
-          onIndexChanged={i => setPage(i)}>
+          onPageSelected={e => {
+            setPage(e.nativeEvent.position);
+          }}
+          >
           {/* Building */}
-          <Thread
+          <Thread 
+            key={0}
             POST_DATA={Post}
             handleScrollHeader={handleScrollHeader}
             refreshing={refreshing}
@@ -118,12 +121,13 @@ export const Home = ({ navigation }: any) => {
           />
           {/* Neighborhood */}
           <Thread
+            key={1}
             POST_DATA={POST_DATA}
             handleScrollHeader={handleScrollHeader}
             refreshing={refreshing}
             setRefreshing={setRefreshing}
           />
-        </Swiper>
+        </PagerView>
       </SafeAreaView>
       <PostModal toggleModal={toggleModal} isShow={isVisible} />
     </>
@@ -159,7 +163,7 @@ const styles = StyleSheet.create({
     height: 40,
     width: 40,
   },
-  wrapper: {},
+  wrapper: { flex: 1 },
   separator: {
     height: 4,
     width: '100%',

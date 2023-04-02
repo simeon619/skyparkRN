@@ -8,7 +8,7 @@ const PostImages = ({ images }: { images: string[] }) => {
       key={index}
       style={[styles[style], { borderWidth: 1, borderColor: '#efefee' }]}
       resizeMethod={'scale'}
-      resizeMode={'contain'}
+      resizeMode={'cover'}
       source={{
         uri: imageUri
           ? imageUri

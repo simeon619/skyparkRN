@@ -1,7 +1,7 @@
 export const COLORS = {
 
 backgroundInput : "rgb(247 250 254)",
-blue : 'rgb(12 74 110)',
+blue : 'rgba(144,64,226,255)',
 bluefade : 'rgb(12 74 110)',
 backgroundLogin : "#fefefe",
 error : "#e75612",

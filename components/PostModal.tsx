@@ -79,7 +79,7 @@ const PostModal = ({
   const modalStyle = useAnimatedStyle(() => {
     const u1 = !isShow
       ? {
-          translateY: withDelay(400, withSpring(isShow ? 0 : SCREEN_HEIGHT)),
+          translateY: withDelay(100, withSpring(isShow ? 0 : SCREEN_HEIGHT)),
         }
       : { translateY: withSpring(isShow ? 0 : SCREEN_HEIGHT) };
     return {
@@ -206,11 +206,12 @@ const PostModal = ({
                         fontSize: 18,
                         backgroundColor: COLORS.blue,
                         paddingHorizontal: 20,
-                        paddingVertical: 10,
+                        paddingVertical: 5,
+                        marginVertical : 5,
                         fontFamily: 'Ubuntu-Regular',
                         alignSelf: 'center',
                         fontWeight: '700',
-                        borderRadius: 5,
+                        borderRadius: 25,
                       },
                     ]}>
                     Publish
