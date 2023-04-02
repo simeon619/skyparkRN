@@ -1,32 +1,18 @@
 import * as Keychain from 'react-native-keychain';
 import { io } from 'socket.io-client';
-import { createModelFrom, getDesription, getDesriptions } from './SQueryUtils';
-const SQuery: any = {};
-/**
- * 
- * const socket = io(null,{
-    extraHeaders: {
-        cookie: null/keyChaine.get("cookie")/||'',
-    }
-});
+import {
+  createModelFrom,
+  getDesription,
+  getDesriptions,
+} from './SQueryUtils';
+const SQuery: { [str: string]: any } = {};
 
-socket.on("storeCookie", (cookie) => {
-   //keyChaine.set('cookie',cookie);
-    socket.io.opts.extraHeaders = {
-        ...socket.io.opts.extraHeaders,
-        cookie,
-    }
-});
- */
-
-// Keychain.getGenericPassword('cookie')
-
-const socket = io('http://192.168.1.4:3500');
+const socket = io('http://192.168.1.2:3500');
 
 (async () => {
   let u: any = await Keychain.getGenericPassword();
   console.log(u);
-  
+
   socket.io.opts.extraHeaders = {
     ...socket.io.opts.extraHeaders,
     cookie: u.password,
@@ -41,9 +27,9 @@ socket.on('storeCookie', async cookie => {
       ...socket.io.opts.extraHeaders,
       cookie,
     };
-    console.log('Cookie stored successfully');
+
   } catch (error) {
-    console.log('Error storing cookie:', error);
+    // console.log('Error storing cookie:', error);
   }
 });
 
@@ -52,8 +38,7 @@ SQuery.socket = socket;
 SQuery.Model = async (modelPath: string) => {
   return await createModelFrom(modelPath);
 };
-
-SQuery.emit = (event: string, ...arg: any[]) => {
+SQuery.emitNow = (event: string, ...arg: any[]) => {
   if (typeof event != 'string')
     throw new Error(
       'cannot emit with following event : ' +
@@ -61,14 +46,12 @@ SQuery.emit = (event: string, ...arg: any[]) => {
         '; event value must be string',
     );
   if (SQuery.socket.connected) {
-    console.log('event:'+event);
-    
     socket.emit(event, ...arg);
   } else {
     throw new Error('DISCONNECT FROM SERVER');
   }
 };
-SQuery.emitLater = (event: string, ...arg: any[]) => {
+SQuery.emit = (event: string, ...arg: string[]) => {
   if (typeof event != 'string')
     throw new Error(
       'cannot emit with following event : ' +
@@ -78,11 +61,15 @@ SQuery.emitLater = (event: string, ...arg: any[]) => {
   socket.emit(event, ...arg);
 };
 
-SQuery.on = (event: string, listener: any) => {
-
-  socket.on(event, listener);
+SQuery.on = (event: string, cb: (...args: any[]) => void) => {
+  if (typeof event != 'string')
+    throw new Error(
+      'cannot emit with following event : ' +
+        event +
+        '; event value must be string',
+    );
+  socket.on(event, cb);
 };
-
 SQuery.getDesription = getDesription;
 SQuery.getDesriptions = getDesriptions;
 
@@ -99,21 +86,21 @@ SQuery.getDesriptions = getDesriptions;
 //         },
 //     }
 // }
-const ValidationMap: any = {
+const ValidationMap: { [str: string]: any } = {
   String: ['minlength', 'maxlength', 'match', 'enum', 'required'],
   Number: ['min', 'max', 'enum', 'required'],
   Date: ['min', 'max', 'enum', 'required'],
   Array: ['length', 'required'], //////////
 };
 
-function isValideType(ruleTypes: any[], type: string) {
+function isValideType(ruleTypes: any, type: String) {
   const typeSide = type.split('/');
 
   let valide = false;
 
   ruleTypes.forEach((ruleType: any) => {
     const ruleSide = ruleType.split('/');
-    const match = (side: any) => {
+    const match = (side: number) => {
       if (ruleSide[side] == '*') return true;
       else if (
         ruleSide[side].toLocaleLowerCase() == typeSide[side].toLocaleLowerCase()
@@ -129,11 +116,8 @@ function isValideType(ruleTypes: any[], type: string) {
   return valide;
 }
 
-const validations: any = {
-  minlength: (
-    value: string | any[],
-    requirement: string | number | number[],
-  ) => {
+const validations :any  = {
+  minlength: (value: any, requirement: any) => {
     let isValide = false;
 
     if (Array.isArray(requirement)) {
@@ -146,10 +130,7 @@ const validations: any = {
       message: isValide ? '' : 'the minimun Length is ' + requirement,
     };
   },
-  maxlength: (
-    value: string | any[],
-    requirement: string | number | number[],
-  ) => {
+  maxlength: (value: any, requirement: any) => {
     let isValide = false;
     if (Array.isArray(requirement)) {
       isValide = value.length <= requirement[0];
@@ -176,7 +157,7 @@ const validations: any = {
     };
   },
   match: (value: string, requirement: string | RegExp) => {
-    console.log(requirement);
+    // console.log(requirement);
     const re = new RegExp(requirement);
     const isValide = re.test(value);
     return {
@@ -191,15 +172,18 @@ const validations: any = {
       message: isValide ? '' : 'the value must be included in : ' + requirement,
     };
   },
-  file: (value: { type: any }, requirement: any) => {
-    console.log(
-      'value.type',
-      value.type,
-      'isValide',
-      isValideType(requirement.type || ['*/*'], value.type),
-    );
+  file: (value: { type: String }, requirement: any) => {
+    // console.log(
+    //   'value.type',
+    //   value.type,
+    //   'isValide',
+    //   isValideType(requirement.type || ['*/*'], value.type),
+    // );
     if (value.type && isValideType(requirement.type || ['*/*'], value.type)) {
-      return 'the value must be included in : ' + requirement;
+      return {
+        isValide: false,
+        message: 'the value must be included in : ' + requirement,
+      };
     }
     return true;
   },
@@ -299,28 +283,31 @@ const validations: any = {
   },
 };
 
-SQuery.Validatior = async (rule: any, value: any) => {
+SQuery.Validatior = async (
+  rule: any,
+  value: any,
+) => {
   let res = await validations.type(value, rule.type);
-  console.log('rule : ', rule, 'value : ', value, 'res: ', res);
+//   console.log('rule : ', rule, 'value : ', value, 'res: ', res);
   if (!res.isValide)
     return {
       message: res.message,
-      e: console.log('res: ', { res }),
+    //   e: console.log('res: ', { res }),
     };
 
   if (ValidationMap[rule.type]) {
     for (const p of ValidationMap[rule.type]) {
       if (rule[p] && validations[p]) {
-        console.log(
-          'rule[p] : ',
-          rule[p],
-          'value : ',
-          validations[p](value, rule[p]),
-        );
+        // console.log(
+        //   'rule[p] : ',
+        //   rule[p],
+        //   'value : ',
+        //   validations[p](value, rule[p]),
+        // );
         if (!(res = validations[p](value, rule[p])).isValide)
           return {
             message: res.message,
-            e: console.log('res: ', { res }),
+            // e: console.log('res: ', { res }),
           };
       }
     }
@@ -329,7 +316,7 @@ SQuery.Validatior = async (rule: any, value: any) => {
     if (!(res = validations.file(value, rule.file)).isValide)
       return {
         message: res.message,
-        e: console.log('res: ', { res }),
+        // e: console.log('res: ', { res }),
       };
   }
 

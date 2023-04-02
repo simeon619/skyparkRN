@@ -1,5 +1,6 @@
 package com.loginskypark;
 
+import com.rnfs.RNFSPackage; 
 import com.brentvatne.react.ReactVideoPackage;
 import android.app.Application;
 import com.facebook.react.PackageList;
@@ -27,12 +28,13 @@ public class MainApplication extends Application implements ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           packages.add(new ReactVideoPackage());
-     return packages;
+          // packages.add(new RNFSPackage() );
+          return packages;
         }
         // @Override
         // protected List<ReactPackage> getPackages() {
-        //     return Arrays.asList(
-        //             new ReactVideoPackage()
+        //     return Arrays.asList( 
+        //             new ReactVideoPackage(),new RNFSPackage()
         //     );
         // }
         @Override

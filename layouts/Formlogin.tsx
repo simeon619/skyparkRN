@@ -2,9 +2,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { StyleSheet, Text, View } from 'react-native';
+import { useDispatch } from 'react-redux';
 import * as yup from 'yup';
 import { Input } from '../components/Inputs';
-//import SQuery from '../utils/squery/SQueryClient';
+import { COLORS } from '../themes/colors';
+// import { PropsNaivation } from '../utils/schemaType';
+import SQuery from '../utils/squery/SQueryClient';
+import { addInfoUser } from '../wharehouse/store';
 
 type formSchema = {
   email: string;
@@ -29,7 +33,7 @@ const validationSchema = yup
   })
   .required();
 
-const FormLogin = ({ navigation }: { navigation?: any }) => {
+const FormLogin = ({ navigation }: any) => {
   const {
     control,
     handleSubmit,
@@ -41,28 +45,53 @@ const FormLogin = ({ navigation }: { navigation?: any }) => {
     modelPath: string;
     id: string;
   }>();
-  // function sendServer(data: formSchema) {
-  //   SQuery.emitLater('login:user', data, async (res: any) => {
-  //     if (res.error) return console.log(JSON.stringify(res));
+  const dispatch = useDispatch();
+  const objUser: { [key: string]: string } = { name: 'er' };
 
-  //     const data = {
-  //       modelPath: 'account',
-  //       id: res.response.loginId,
-  //     };
-  //     let model = await SQuery.Model('account');
-  //     let account = await model.instance({
-  //       id: res.response.loginId,
-  //     });
-  //     let name = await account['name']
-  //     // console.log(account.when());
-      
-  //     account.when('refresh:name' , (name :string)=>{
-  //       console.log(name);
-  //     })
-  //     console.log(name);
-  //     account['name'] = 'GREGROIRE';
-  //   });
-  // }
+  const addPropertyUser = (key: string, value: string) => {
+    objUser[key] = value;
+  };
+  function sendServer(data: formSchema) {
+    SQuery.emit('login:user', data, async (res: any) => {
+      if (res.error) return console.log(JSON.stringify(res));
+
+      const data = {
+        modelPath: 'account',
+        id: res.response.loginId,
+      };
+      let model = await SQuery.Model('account');
+      let account = await model.newInstance({
+        id: res.response.loginId,
+      });
+    
+      try {
+        if (account === null) {
+          return
+        }
+          let user = await account.newParentInstance();
+        addPropertyUser('userId', user.$id  )
+        addPropertyUser('accountId', account?.$id  )
+        addPropertyUser('name', await account['name']);
+        addPropertyUser('email', await account['email']);
+        addPropertyUser('telephone', await account['telephone']);
+        let address = await account['address'];
+        addPropertyUser('location', await address['location']);
+        addPropertyUser('room', await address['room']);
+        addPropertyUser('door', await address['door']);
+        addPropertyUser('etage', await address['etage']);
+        let building = await user['building'];
+        addPropertyUser('buildingName', await building['name']);
+        addPropertyUser('city', await building['city']);
+        let profile = await account['profile'];
+        addPropertyUser('imgProfile', await profile['imgProfile']);
+        addPropertyUser('banner', await profile['banner']);
+        addPropertyUser('message', await profile['message']);
+      } catch (error) {}
+
+      dispatch(addInfoUser(objUser));
+      navigation?.navigate('Infoprofile');
+    });
+  }
 
   return (
     <View style={styles.form}>
@@ -81,7 +110,7 @@ const FormLogin = ({ navigation }: { navigation?: any }) => {
 
       <View style={styles.btnConnexion}>
         <Text
-          // onPress={handleSubmit(sendServer)}
+          onPress={handleSubmit(sendServer)}
           style={[
             styles.textConnexion,
             !isValid && { backgroundColor: '#12347add' },
@@ -91,7 +120,7 @@ const FormLogin = ({ navigation }: { navigation?: any }) => {
       </View>
 
       <View style={styles.gotoregister}>
-        <Text style={styles.simple}>vous n'avez pas de compte ?</Text>
+        <Text style={styles.simple}>you have don't any account ?</Text>
         <Text
           style={styles.link}
           onPress={() => {
@@ -99,6 +128,7 @@ const FormLogin = ({ navigation }: { navigation?: any }) => {
           }}>
           click here
         </Text>
+        <Text style={styles.forgetpsswd}>password forget ?</Text>
       </View>
     </View>
   );
@@ -108,22 +138,32 @@ const styles = StyleSheet.create({
   form: {
     alignItems: 'center',
   },
-
+  forgetpsswd: {
+    textAlign: 'center',
+    color: COLORS.blue,
+    fontSize: 15,
+    fontFamily: 'Kurale-Regular',
+    // textDecorationLine: 'underline',
+    fontWeight: '800',
+  },
   gotoregister: {
     flexDirection: 'row',
     marginTop: 20,
-    gap: 10,
+    flexWrap: 'wrap',
+    gap: 5,
     alignItems: 'center',
+    justifyContent: 'center',
   },
 
   simple: {
     fontFamily: 'Kurale-Regular',
     fontSize: 18,
+    color: '#777',
   },
   link: {
     color: 'rgb(12 74 110)',
     fontWeight: '900',
-    textDecorationLine: 'underline',
+    // textDecorationLine: 'underline',
     fontFamily: 'Kurale-Regular',
     fontSize: 16,
   },

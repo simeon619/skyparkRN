@@ -6,23 +6,22 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { COLORS } from '../themes/colors';
 import { RATIO_HEADER } from '../utils/metric';
+// import { PropsNaivation } from '../utils/schemaType';
 
 const { width, height } = Dimensions.get('window');
-export const Header = ({ navigation, page, onSwitchPage }: {
+export const Header = ({ navigation , page, onSwitchPage }: {
   navigation : any , page : number , onSwitchPage :(index: number) => void 
 }) => {
-  const toggleDrawer = () => {
-    navigation.toggleDrawer();
-  };
+
 
   return (
     <>
       <View style={styles.topHeader}>
-        <Pressable onPress={toggleDrawer} style={{ alignSelf: 'center' }}>
+        <Pressable onPress={()=>{navigation.openDrawer();}} style={{ alignSelf: 'center' }}>
           <Image
             style={styles.avatar}
             source={require('../assets/images/user.png')}
@@ -31,7 +30,7 @@ export const Header = ({ navigation, page, onSwitchPage }: {
         <Pressable onPress={() => {}} style={{ alignSelf: 'center' }}>
           <Text
             style={{
-              fontSize: 35,
+              fontSize: 30,
               color: 'black',
               fontFamily: 'Kurale-Regular',
               marginRight: 55,

@@ -1,4 +1,4 @@
-import { PostSchema } from '../posts';
+import { PostSchema } from './posts';
 
 export function createRandomPosts(numberOfPosts: number): PostSchema[] {
   const randomPosts: PostSchema[] = [];
@@ -20,7 +20,6 @@ export function createRandomPosts(numberOfPosts: number): PostSchema[] {
       'https://picsum.photos/1210/1210.jpg',
       'https://picsum.photos/800/1210.jpg',
       'https://picsum.photos/900/1210.jpg',
-  
     ];
     const randomImageUrl =
       randomImageUrls[Math.floor(Math.random() * randomImageUrls.length)];
@@ -41,18 +40,17 @@ export function createRandomPosts(numberOfPosts: number): PostSchema[] {
         name: 'John Smith',
         picture:
           'https://images.pexels.com/photos/14737533/pexels-photo-14737533.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        id: randomAuthorId,
       },
       type: 'image',
       content: randomPostContent,
-      images:[ 
-        'https://picsum.photos/1200/1250.jpg',
+      images: [
+        'https://picsum.photos/1200/1550.jpg',
         'https://picsum.photos/1310/1200.jpg',
         'https://picsum.photos/1210/1210.jpg',
         'https://picsum.photos/1210/1250.jpg',
       ],
       // videos : 'https://www.youtube.com/watch?v=62y60i6k1YM',
-      // images:[ 
+      // images:[
       //   'https://images.pexels.com/photos/13931403/pexels-photo-13931403.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
       //   'https://images.pexels.com/photos/15507656/pexels-photo-15507656.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
       //   'https://images.pexels.com/photos/9495080/pexels-photo-9495080.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',

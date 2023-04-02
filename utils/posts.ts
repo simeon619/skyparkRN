@@ -1,9 +1,8 @@
-import { createRandomPosts } from "./utils/RandomPost";
+import { createRandomPosts } from './RandomPost';
 
 type Author = {
   name: string;
   picture: string;
-  id: string;
 };
 
 type Comment = {
@@ -26,7 +25,7 @@ export type PostSchema = {
   type: string;
   content: string;
   images?: string[];
-  videos? :string;
+  videos?: string;
   likes: number;
   comments: Comment[];
   timestamp: string;
@@ -36,5 +35,5 @@ export type PostList = {
   posts: PostSchema[];
 };
 
-export const POST_DATA: PostSchema[] = createRandomPosts(19)
-export const POST_DATA2: PostSchema[] = createRandomPosts(19)
+export const POST_DATA: PostSchema[] = createRandomPosts(19);
+export const POST_DATA2: PostSchema[] = createRandomPosts(19);

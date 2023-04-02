@@ -1,26 +1,61 @@
-import React from 'react';
-import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, Image, StyleSheet, View } from 'react-native';
 const { width, height } = Dimensions.get('window');
 //ts-ignore
-import Video from 'react-native-video';
 const PostImages = ({ images }: { images: string[] }) => {
   const renderImage = (imageUri: string, index: number, style: any) => (
-      <Image
-        key={index}
-        style={[styles[style], {borderWidth :1 , borderColor :'#efefee'}]}
-        source={{
-          uri: imageUri
-            ? imageUri
-            : 'https://images.pexels.com/photos/6307706/pexels-photo-6307706.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        }}
-      />
+    <Image
+      key={index}
+      style={[styles[style], { borderWidth: 1, borderColor: '#efefee' }]}
+      resizeMethod={'scale'}
+      resizeMode={'contain'}
+      source={{
+        uri: imageUri
+          ? imageUri
+          : 'https://images.pexels.com/photos/6307706/pexels-photo-6307706.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      }}
+    />
   );
+  const [imageHeights, setImageHeights] = useState<number[]>([]);
+
+  useEffect(() => {
+    const fetchImageHeights = async () => {
+      const heights = await Promise.all(
+        images.map(imageUri => getImageHeight(imageUri)),
+      );
+      setImageHeights(heights);
+    };
+    fetchImageHeights();
+  }, [images]);
+
+  const getImageHeight = async (imageUri: string) => {
+    return new Promise<number>((resolve, reject) => {
+      Image.getSize(
+        imageUri,
+        (width: number, height: number) => {
+          resolve(height);
+        },
+        (error: any) => {
+          reject(error);
+        },
+      );
+    });
+  };
+
+  console.log(images);
+
   return (
-    <View style={styles.container}>
-      {images.map((image, index, images) =>
-        renderImage(image, index, `s${images.length}To${index+1}`),
+    <>
+      {images.length > 0 && (
+        <View style={styles.container}>
+          {images
+            .filter(image => image != '')
+            .map((image, index, images) =>
+              renderImage(image, index, `s${images.length}To${index + 1}`),
+            )}
+        </View>
       )}
-    </View>
+    </>
   );
 };
 

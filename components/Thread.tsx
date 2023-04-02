@@ -6,8 +6,9 @@ import {
   NativeSyntheticEvent,
   RefreshControl,
 } from 'react-native';
-import { PostSchema } from '../posts';
+
 import { RATIO_HEADER } from '../utils/metric';
+import { PostSchema } from '../utils/posts';
 import Postcomponent from './Post/Postcomponent';
 const { width, height } = Dimensions.get('window');
 const Thread = ({
@@ -19,7 +20,7 @@ const Thread = ({
   POST_DATA: PostSchema[];
   refreshing: boolean;
   setRefreshing: (value: boolean) => void;
-  handleScrollHeader: (e: number) => void;
+  handleScrollHeader?: (e: number) => void;
 }) => {
   let HEADER_HEIGHT = (RATIO_HEADER * height) / 100;
   return (
@@ -29,14 +30,17 @@ const Thread = ({
       estimatedItemSize={height / 2.3}
       bounces={true}
       // refreshing={refreshing}
-      contentContainerStyle={{
+      contentContainerStyle={handleScrollHeader &&{
         paddingTop: HEADER_HEIGHT,
         paddingBottom: 20,
       }}
       showsVerticalScrollIndicator={false}
       // onRefresh={() => setRefreshing(true)}
       onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
-        handleScrollHeader(e.nativeEvent.contentOffset.y);
+        if(handleScrollHeader){
+          handleScrollHeader(e.nativeEvent.contentOffset.y);
+        }
+      
       }}
       refreshControl={
         <RefreshControl
@@ -45,7 +49,7 @@ const Thread = ({
           colors={['#00ff00']} // couleur verte pour Android
           progressBackgroundColor="#000000" // fond noir pour Android
           tintColor="#00ff00" // couleur verte pour iOS
-          title="Chargement..."
+          title="Loading..."
           titleColor="#00ff00" // couleur verte pour iOS
         />
       }

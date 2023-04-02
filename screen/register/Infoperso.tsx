@@ -1,3 +1,4 @@
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Formperso } from '../../layouts/Formperso';
 import { COLORS } from '../../themes/colors';

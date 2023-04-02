@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
+  Animated,
   Image,
   Pressable,
   SafeAreaView,
@@ -8,18 +9,51 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Animated
 } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
-import Modal from 'react-native-modal';
+import { Modal, Portal } from 'react-native-paper';
+// import Modal from 'react-native-modal';
+import RNFS from 'react-native-fs';
+import { useSelector } from 'react-redux';
 import { COLORS } from '../../themes/colors';
 import { normalize } from '../../themes/metrics';
-export const Infoprofile = (props: any) => {
+import { PropsNavigation } from '../../utils/schemaType';
+import SQuery from '../../utils/squery/SQueryClient';
+// import { PropsNaivation } from '../../utils/schemaType';
+export const Infoprofile = (props: PropsNavigation) => {
   const { navigation } = props;
-  const [uri, setUri] = useState('');
+
   const [visible, setVisible] = useState(false);
   const close = () => setVisible(false);
   const open = () => setVisible(true);
+  let User = useSelector((state: any) => state.dataUser);
+  const [uri, setUri] = useState('');
+  const [name, setName] = useState<string>(User?.name);
+  const [status, setStatus] = useState('Locataire');
+  const [room, setRoom] = useState(User?.room);
+  const [door, setDoor] = useState(User?.door);
+  const [etage, setEtage] = useState(User?.etage);
+  const [email, setEmail] = useState(User?.email);
+  const [telephone, setTelephone] = useState(User?.telephone);
+  const [city, setCity] = useState(User?.city);
+  const [buildingName, setBuildingName] = useState(User?.buildingName);
+  let model = null;
+  let account = null;
+  let profile: any = null;
+  const refresh = async () => {
+    model = await SQuery.Model('account');
+    account = await model.newInstance({
+      id: User.accountId,
+    });
+    profile = await account['profile'];
+    account?.when('refresh:name', setName);
+    account?.when('refresh:telephone', setTelephone);
+    account?.when('refresh:email', setEmail);
+    account?.when('refresh:status', setStatus);
+    profile?.when('refresh:imgProfile', setUri);
+  };
+
+  refresh();
 
   const chooseImage = () => {
     ImagePicker.openPicker({
@@ -27,8 +61,12 @@ export const Infoprofile = (props: any) => {
       height: 400,
       cropping: true,
     })
-      .then(image => {
-        setUri(image.path);
+      .then(async image => {
+        let buffer = await RNFS.readFile(image.path, 'base64');
+        let fileImage = { ...image, buffer, fileName: 'darwinj' };
+        console.log('profile', profile);
+
+        profile['imgProfile'] = [fileImage];
       })
       .catch(e => {
         console.log(e);
@@ -42,6 +80,8 @@ export const Infoprofile = (props: any) => {
       cropping: true,
     })
       .then(image => {
+        console.log({ image });
+
         setUri(image.path);
       })
       .catch(e => {
@@ -50,42 +90,52 @@ export const Infoprofile = (props: any) => {
       .finally(close);
   };
 
+  // useEffect(() => {
+  //   setUri('http://192.168.1.2:3500' + User.imgProfile[0]);
+  // }, []);
+
+  const [translateY] = useState(new Animated.Value(0));
+  const showModal = () => {
+    setVisible(true);
+  };
+
+  const hideModal = () => {
+    setVisible(false);
+  };
 
   return (
     <ScrollView
       style={{
         backgroundColor: COLORS.backgroundLogin,
-        margin: 10,
         flex: 1,
         alignContent: 'center',
-        elevation: 10,
       }}>
       <View style={styles.containHeader}>
         <Text style={styles.TextHeader}>Profile</Text>
       </View>
       <View style={styles.containProfile}>
-        <TouchableOpacity onPress={open}>
+        <TouchableOpacity onPress={showModal}>
           <Image
             style={styles.avatar}
             source={uri ? { uri } : require('../../assets/images/user.png')}
           />
         </TouchableOpacity>
-        <Text style={styles.name}>komlan simeon</Text>
+        <Text style={styles.name}>{name}</Text>
         <Text style={styles.status}>Locataire</Text>
       </View>
       <View style={styles.AddressContain}>
-        <Animated.View style={styles.room}>
-          <Text style={styles.valueAdress}>28</Text>
+        <View style={styles.room}>
+          <Text style={styles.valueAdress}>{room}</Text>
           <Text style={styles.titleAdress}>Flat</Text>
-        </Animated.View>
+        </View>
         <View style={styles.door}>
-          <Text style={styles.valueAdress}>78</Text>
+          <Text style={styles.valueAdress}>{door}</Text>
           <Text style={styles.titleAdress}>Entrance</Text>
         </View>
-        <Animated.View style={styles.stair}>
-          <Text style={styles.valueAdress}>16</Text>
+        <View style={styles.stair}>
+          <Text style={styles.valueAdress}>{etage}</Text>
           <Text style={styles.titleAdress}>Floor</Text>
-        </Animated.View>
+        </View>
       </View>
 
       <Text style={styles.txtHeader}></Text>
@@ -95,34 +145,33 @@ export const Infoprofile = (props: any) => {
             style={styles.icon1}
             source={require('../../assets/images/email.png')}
           />
-          <Text style={styles.icontxt}>sijean619@gmail.com</Text>
+          <Text style={styles.icontxt}>{email}</Text>
         </View>
         <View style={styles.containIcon}>
           <Image
             style={styles.icon1}
             source={require('../../assets/images/telephone.png')}
           />
-          <Text style={styles.icontxt}>+225 0565848273</Text>
+          <Text style={styles.icontxt}>{telephone}</Text>
         </View>
         <View style={styles.containIcon}>
           <Image
             style={styles.icon1}
             source={require('../../assets/images/home-address.png')}
           />
-          <Text style={styles.icontxt}>Rostov-On-Don</Text>
+          <Text style={styles.icontxt}>{city}</Text>
         </View>
         <View style={styles.containIcon}>
           <Image
             style={styles.icon1}
             source={require('../../assets/images/building.png')}
           />
-          <Text style={styles.icontxt}>Sublymus E45</Text>
+          <Text style={styles.icontxt}>{buildingName}</Text>
         </View>
       </View>
       <Text
         style={styles.BtnNext}
         onPress={() => {
-          console.log('oops');
           navigation.navigate('drawer');
         }}>
         NEXT
@@ -130,28 +179,39 @@ export const Infoprofile = (props: any) => {
       <Text style={styles.Phrase}>
         Verifiez que les informations sont correctes
       </Text>
-      <Modal
-        isVisible={visible}
-        onBackButtonPress={close}
-        onBackdropPress={close}
-        style={{ justifyContent: 'flex-end', margin: 0 }}>
-        <SafeAreaView style={styles.options}>
-          <Pressable style={styles.option} onPress={chooseImage}>
-            <Image
-              source={require('../../assets/images/image.png')}
-              style={styles.optionSelect}
-            />
-            <Text style={styles.optionSelectText}>Library </Text>
-          </Pressable>
-          <Pressable style={styles.option} onPress={openCamera}>
-            <Image
-              source={require('../../assets/images/diaphragm.png')}
-              style={styles.optionSelect}
-            />
-            <Text style={styles.optionSelectText}>Camera</Text>
-          </Pressable>
-        </SafeAreaView>
-      </Modal>
+      <Portal>
+        <Modal
+          visible={visible}
+          onDismiss={hideModal}
+          contentContainerStyle={[
+            {
+              backgroundColor: 'white',
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              borderRadius: 10,
+              transform: [{ translateY }],
+            },
+          ]}>
+          <SafeAreaView style={styles.options}>
+            <Pressable style={styles.option} onPress={chooseImage}>
+              <Image
+                source={require('../../assets/images/image.png')}
+                style={styles.optionSelect}
+              />
+              <Text style={styles.optionSelectText}>Library </Text>
+            </Pressable>
+            <Pressable style={styles.option} onPress={openCamera}>
+              <Image
+                source={require('../../assets/images/diaphragm.png')}
+                style={styles.optionSelect}
+              />
+              <Text style={styles.optionSelectText}>Camera</Text>
+            </Pressable>
+          </SafeAreaView>
+        </Modal>
+      </Portal>
     </ScrollView>
   );
 };
@@ -166,14 +226,14 @@ const styles = StyleSheet.create({
   },
   optionSelect: {
     marginVertical: 10,
-    height: 60,
-    width: 60,
+    height: 30,
+    width: 30,
   },
 
   optionSelectText: {
-    fontSize: 20,
+    fontSize: 15,
     color: COLORS.black,
-    fontWeight: '600',
+    fontWeight: '400',
   },
   options: {
     backgroundColor: COLORS.white,
@@ -185,6 +245,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 10,
   },
   containHeader: {
     alignItems: 'center',
@@ -195,7 +256,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     letterSpacing: 5,
     fontWeight: '700',
-    textTransform : 'capitalize',
+    textTransform: 'capitalize',
   },
   containProfile: {
     alignItems: 'center',
@@ -259,11 +320,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.backgroundInput,
     fontSize: 5,
     textAlign: 'center',
+    marginBottom: 25,
     textTransform: 'uppercase',
   },
   icon1: {
     height: 15,
-    width: 10,
+    width: 15,
     padding: 13,
   },
   containIcon: {
@@ -272,7 +334,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 3,
     paddingBottom: 2,
-    gap: 25,
+    gap: 1,
     borderBottomColor: COLORS.purple,
     borderBottomWidth: 5,
   },

@@ -1,6 +1,6 @@
 import React, { memo, useState } from 'react';
 import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
-import { PostSchema } from '../../posts';
+import { PostSchema } from '../../utils/posts';
 import PostImages from './PostImages';
 import PostVideo from './PostVideo';
 type PostListProps = {
@@ -24,16 +24,28 @@ const PostComponent = (props: PostListProps) => {
               style={{
                 height: 40,
                 width: 40,
-                borderRadius : 99
+                borderRadius: 99,
               }}
               source={uri ? { uri } : require('../../assets/images/user.png')}
               resizeMode={'contain'}
             />
             <View>
-              <Text style={{ color: 'black', fontSize: 16, fontWeight: '800', fontFamily : 'Ubuntu-Regular', }}>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 16,
+                  fontWeight: '800',
+                  fontFamily: 'Ubuntu-Regular',
+                }}>
                 {posts.author.name}
               </Text>
-              <Text style={{ color: 'black', fontSize: 11 ,fontWeight: '100',fontFamily : 'Ubuntu-Regular' }}>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 11,
+                  fontWeight: '100',
+                  fontFamily: 'Ubuntu-Regular',
+                }}>
                 {new Date(timePost).getUTCHours()} h.
               </Text>
             </View>
@@ -43,7 +55,7 @@ const PostComponent = (props: PostListProps) => {
               style={{
                 color: 'grey',
                 fontSize: 22,
-                alignSelf : 'center',
+                alignSelf: 'center',
                 fontWeight: '900',
                 letterSpacing: 2,
               }}>
@@ -54,9 +66,9 @@ const PostComponent = (props: PostListProps) => {
         <View style={{ backgroundColor: 'white', paddingHorizontal: 7 }}>
           <Text
             style={{
-              color: '#001',
+              color: '#000',
               fontSize: 14,
-              fontFamily : 'Ubuntu-Light',
+              fontFamily: 'Ubuntu-Regular',
               marginVertical: 7,
             }}>
             {posts.content.toString()}.
@@ -64,7 +76,7 @@ const PostComponent = (props: PostListProps) => {
         </View>
         <View>
           {pics && <PostImages images={pics} />}
-          {video && <PostVideo video={video} />}
+          {/* {video && <PostVideo video={video} />} */}
         </View>
         <View style={styles.postFooter}>
           <View style={styles.statsPost}>
@@ -85,7 +97,7 @@ const PostComponent = (props: PostListProps) => {
                   source={require('../../assets/images/comment1.png')}
                 /> */}
                 <Text style={styles.Textstats}>{likes}</Text>
-                <Text style={styles.Textstats} >comments .</Text>
+                <Text style={styles.Textstats}>comments .</Text>
               </View>
               <View style={styles.stats}>
                 {/* <Image
@@ -130,16 +142,16 @@ const styles = StyleSheet.create({
   like: {
     width: 15,
     height: 15,
-    tintColor : 'grey'
+    tintColor: '#555',
   },
-  Textstats :{fontSize: 14 , color : '#999' , fontFamily : 'Ubuntu-Regular'},
+  Textstats: { fontSize: 14, color: '#555', fontFamily: 'Ubuntu-Regular' },
   Ilike: {
     width: 18,
     height: 18,
-    tintColor : '#999'
+    tintColor: '#555',
   },
   stats: { flexDirection: 'row', gap: 6, alignItems: 'center' },
-  stats1 :{ fontSize: 18 , color : '#999' , fontFamily : 'Ubuntu-Regular'},
+  stats1: { fontSize: 18, color: '#555', fontFamily: 'Ubuntu-Regular' },
   postHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',

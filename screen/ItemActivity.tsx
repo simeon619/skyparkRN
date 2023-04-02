@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import React from 'react';
 import {
@@ -9,6 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { PropsNavigation } from '../utils/schemaType';
 type ActivitySchema = {
   id: string;
   name: string;
@@ -19,7 +21,8 @@ type ActivitySchema = {
 type ArrayActivity = ActivitySchema[];
 
 const { width, height } = Dimensions.get('window');
-const ItemActivity = ({ navigation }: any) => {
+const ItemActivity = (props: PropsNavigation ) => {
+  const { navigation  } = props;
   const ItemsActivty: ArrayActivity = [
     {
       id: '6415453465',
@@ -51,8 +54,7 @@ const ItemActivity = ({ navigation }: any) => {
     },
   ];
 
-  const ItemView = (props: { item: ActivitySchema , navigation :any }) => {
-    const { item } = props;
+  const ItemView = ({ item }: { item: ActivitySchema }) => {
     return (
       <View
         style={{
@@ -65,10 +67,7 @@ const ItemActivity = ({ navigation }: any) => {
         }}>
         <Pressable
           onPress={() => {
-            navigation.navigate('Activity');
-
-            console.log('je suis');
-            
+          navigation.getParent()?.navigate('Activity' , { nameActivity : item.name ,  nameUser: 'Jean'})
           }}>
           <ImageBackground
             source={{ uri: item.picture }}
@@ -123,7 +122,7 @@ const ItemActivity = ({ navigation }: any) => {
         showsVerticalScrollIndicator={false}
         estimatedItemSize={height / 5}
         keyExtractor={item => item.id}
-        renderItem={({ item }) => <ItemView item={item} navigation={navigation} />}
+        renderItem={({ item }) => <ItemView item={item} />}
       />
     </View>
   );

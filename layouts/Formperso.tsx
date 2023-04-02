@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import * as yup from 'yup';
 import { Input } from '../components/Inputs';
 import { COLORS } from '../themes/colors';
-import { addInfo } from '../wharehouse/store';
+import { addInfoUser } from '../wharehouse/store';
 
 type formSchema = {
   name: string;
@@ -36,7 +36,6 @@ export const Formperso = ({ navigation }: { navigation?: any }) => {
         .required('Veuillez confirme votre mot de passe')
         .oneOf([yup.ref('password')], 'mot depasse ne corespondes pas'),
     })
-
     .required();
 
   const {
@@ -49,7 +48,7 @@ export const Formperso = ({ navigation }: { navigation?: any }) => {
 
   const dispatch = useDispatch();
   function submit(data: formSchema) {
-    dispatch(addInfo(data));
+    dispatch(addInfoUser(data));
     navigation.navigate('Infoprofile');
   }
 

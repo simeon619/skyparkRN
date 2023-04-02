@@ -1,6 +1,18 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useController } from 'react-hook-form';
-import { Image, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  Image,
+  Keyboard,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { COLORS } from '../themes/colors';
 const randomImages = [
   require('../assets/images/padlock.png'),
@@ -33,7 +45,7 @@ export const Input = ({
     | 'default'
     | 'email-address'
     | 'numbers-and-punctuation' = 'default';
-    let password = false
+  let password = false;
   switch (name) {
     case 'code':
     case 'number':
@@ -77,6 +89,85 @@ export const Input = ({
       {!!errorDeatils && <Text style={styles.error}> {errorDeatils} </Text>}
       {!!!errorDeatils && <Text style={styles.error}> {errorDeatils} </Text>}
     </>
+  );
+};
+
+export const InputPost = ({
+  name,
+  control,
+  placeholder,
+  isVisible,
+}: {
+  name: string;
+  control: any;
+  placeholder: string;
+  isVisible: boolean;
+}) => {
+  const {
+    field,
+    fieldState: { error },
+  } = useController({
+    control,
+    defaultValue: '',
+    name,
+  });
+  const height = useSharedValue(40);
+
+  const handleContentSizeChange = useCallback((event: any) => {
+    const newHeight = event.nativeEvent.contentSize.height;
+    height.value = withTiming(newHeight);
+  }, []);
+
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      height: height.value,
+    };
+  });
+
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      ({ endCoordinates }) => {
+        setKeyboardHeight(30);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardHeight(0);
+      },
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
+
+
+  return (
+    <Animated.View style={animatedStyles}>
+      <TextInput
+        style={{
+          textAlignVertical: 'top',
+          backgroundColor: '#fff',
+          color: 'black',
+          fontFamily: 'Ubuntu-Regular',
+          fontSize: 18,
+          flex: 1,
+          paddingBottom: keyboardHeight + 5,
+        }}
+        value={field.value}
+        placeholder={placeholder}
+        placeholderTextColor="black"
+        focusable={isVisible}
+        multiline={true}
+        onContentSizeChange={handleContentSizeChange}
+        onChangeText={field.onChange}
+      />
+    </Animated.View>
   );
 };
 

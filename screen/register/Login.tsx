@@ -1,4 +1,5 @@
 import LottieView from 'lottie-react-native';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import FormLogin from '../../layouts/Formlogin';
 import { COLORS } from '../../themes/colors';
@@ -24,7 +25,7 @@ export const Login = ({ navigation }: any) => {
       <View style={styles.containerForm}>
         <FormLogin navigation={navigation} />
       </View>
-      <Text style={styles.forgetpsswd}>mot de passe oublie ?</Text>
+    
     </View>
   );
 };
