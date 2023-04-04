@@ -7,9 +7,12 @@ const PostImages = ({ images }: { images: string[] }) => {
     <Image
       key={index}
       style={[styles[style], { borderWidth: 1, borderColor: '#efefee' }]}
-      resizeMethod={'scale'}
+      // resizeMethod={'auto'}
+
+      fadeDuration={0}
       resizeMode={'cover'}
       source={{
+        cache: 'force-cache',
         uri: imageUri
           ? imageUri
           : 'https://images.pexels.com/photos/6307706/pexels-photo-6307706.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
@@ -42,8 +45,6 @@ const PostImages = ({ images }: { images: string[] }) => {
     });
   };
 
-  console.log(images);
-
   return (
     <>
       {images.length > 0 && (
@@ -61,15 +62,20 @@ const PostImages = ({ images }: { images: string[] }) => {
 
 const styles: any = StyleSheet.create({
   container: {
-    flexDirection: 'column',
     flexWrap: 'wrap',
-    width,
-    height: height / 2,
+    width: '100%',
+    maxHeight: height / 2.2,
   },
   //********* */
   s1To1: {
     width: '100%',
+    // width : 'auto',
     height: '100%',
+    // justifyContent: 'center',
+    // alignContent: 'center',
+    // alignItems: 'center',
+    // flexDirection: 'row',
+    alignSelf: 'flex-end',
   },
   //********* */
   s2To1: {

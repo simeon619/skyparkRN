@@ -537,7 +537,7 @@ export async function createArrayInstanceFrom({
       );
     }
   };
-  arrayInstance.page = async (page: string | number) => {
+  arrayInstance.page = async (page: number) => {
     if (!page) {
       if (currentData) {
         emiter.emit('dataAvalaible', currentData);
@@ -567,7 +567,7 @@ export async function createArrayInstanceFrom({
     return await refresh();
   };
   arrayInstance.update = async (options: any) => {
-    console.error('**********options********* : ', options);
+    // console.error('**********options********* : ', options);
     return await refresh({ ...options });
   };
   arrayInstance.when = (

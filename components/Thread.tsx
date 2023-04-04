@@ -27,7 +27,7 @@ const Thread = ({
     // Retourner le code JSX
     <FlashList
       data={POST_DATA}
-      estimatedItemSize={height / 2.3}
+      estimatedItemSize={height / 1.5}
       bounces={true}
       // refreshing={refreshing}
       contentContainerStyle={handleScrollHeader &&{

@@ -43,7 +43,7 @@ export const Header = ({ navigation , page, onSwitchPage }: {
           style={{ alignSelf: 'flex-start' }}></Pressable>
       </View>
       <View style={styles.bottomHeader}>
-        <TouchableOpacity onPress={() => onSwitchPage(0)}>
+        <Pressable onPress={() => onSwitchPage(0)}>
           <Text
             style={[
               {
@@ -52,19 +52,19 @@ export const Header = ({ navigation , page, onSwitchPage }: {
                 fontWeight: '600',
                 fontFamily: 'Ubuntu-Regular',
                 paddingBottom: 8,
+                borderBottomColor: '#0000',
+                borderBottomWidth: 4,
               },
               page === 0
                 ? {
-                    borderBottomWidth: 4,
                     borderBottomColor: COLORS.blue,
                     color: COLORS.black,
-                    fontWeight: '700',
                   }
                 : {},
             ]}>
             Building
           </Text>
-        </TouchableOpacity>
+        </Pressable>
         <Pressable onPress={() => onSwitchPage(1)}>
           <Text
             style={[
@@ -74,12 +74,13 @@ export const Header = ({ navigation , page, onSwitchPage }: {
                 fontWeight: '600',
                 paddingBottom: 8,
                 fontFamily: 'Ubuntu-Regular',
+                borderBottomColor: '#0000',
+                borderBottomWidth: 4,
               },
               page === 1
                 ? {
                     borderBottomColor: COLORS.blue,
-                    borderBottomWidth: 4,
-                    fontWeight: '700',
+    
                     color: COLORS.black,
                   }
                 : {},

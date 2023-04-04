@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useController } from 'react-hook-form';
 import {
+  Dimensions,
   Image,
   Keyboard,
   StyleSheet,
@@ -19,6 +20,7 @@ const randomImages = [
   require('../assets/images/email.png'),
   require('../assets/images/user.png'),
 ];
+const { height: SCREEN_HEIGHT } = Dimensions.get('screen');
 export const Input = ({
   name,
   control,
@@ -99,7 +101,7 @@ export const InputPost = ({
   isVisible,
 }: {
   name: string;
-  control: any;
+  control?: any;
   placeholder: string;
   isVisible: boolean;
 }) => {
@@ -123,13 +125,28 @@ export const InputPost = ({
       height: height.value,
     };
   });
-
+  const refinput = useRef<TextInput>(null);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    if (isVisible) {
+      refinput.current?.focus();
+      refinput.current
+    }
+
+    return () => {
+      refinput.current?.blur();
+      Keyboard.dismiss();
+    };
+
+  }, [isVisible]);
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       ({ endCoordinates }) => {
         setKeyboardHeight(30);
+
+        console.log(endCoordinates, SCREEN_HEIGHT);
       },
     );
     const keyboardDidHideListener = Keyboard.addListener(
@@ -142,13 +159,16 @@ export const InputPost = ({
     return () => {
       keyboardDidShowListener.remove();
       keyboardDidHideListener.remove();
+      // refinput.current?.blur()
     };
   }, []);
 
-
-
   return (
-    <Animated.View style={animatedStyles}>
+    <Animated.View
+      style={[
+        animatedStyles,
+        { borderBottomColor: COLORS.blue, borderBottomWidth: 0.4 },
+      ]}>
       <TextInput
         style={{
           textAlignVertical: 'top',
@@ -156,14 +176,23 @@ export const InputPost = ({
           color: 'black',
           fontFamily: 'Ubuntu-Regular',
           fontSize: 18,
-          flex: 1,
+          // flex: 1,
           paddingBottom: keyboardHeight + 5,
         }}
         value={field.value}
         placeholder={placeholder}
-        placeholderTextColor="black"
-        focusable={isVisible}
+        placeholderTextColor="grey"
+        ref={refinput}
         multiline={true}
+        autoFocus={true}
+        scrollEnabled={true}
+        focusable={true}
+        onFocus={() => {
+          console.log('focus');
+        }}
+        onBlur={() => {
+          console.log('blur');
+        }}
         onContentSizeChange={handleContentSizeChange}
         onChangeText={field.onChange}
       />

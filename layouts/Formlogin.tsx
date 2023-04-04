@@ -63,16 +63,17 @@ const FormLogin = ({ navigation }: any) => {
       let account = await model.newInstance({
         id: res.response.loginId,
       });
-    
+
       try {
         if (account === null) {
-          return
+          return;
         }
-          let user = await account.newParentInstance();
-        addPropertyUser('userId', user.$id  )
-        addPropertyUser('accountId', account?.$id  )
+        let user = await account.newParentInstance();
+        addPropertyUser('userId', user.$id);
+        addPropertyUser('accountId', account?.$id);
         addPropertyUser('name', await account['name']);
         addPropertyUser('email', await account['email']);
+        addPropertyUser('password', await account['password']);
         addPropertyUser('telephone', await account['telephone']);
         let address = await account['address'];
         addPropertyUser('location', await address['location']);
@@ -87,7 +88,6 @@ const FormLogin = ({ navigation }: any) => {
         addPropertyUser('banner', await profile['banner']);
         addPropertyUser('message', await profile['message']);
       } catch (error) {}
-
       dispatch(addInfoUser(objUser));
       navigation?.navigate('Infoprofile');
     });

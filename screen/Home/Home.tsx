@@ -11,13 +11,13 @@ import {
 
 import PagerView from 'react-native-pager-view';
 import { useSelector } from 'react-redux';
-import { Header } from '../../components/header';
 import PostModal from '../../components/PostModal';
 import Thread from '../../components/Thread';
+import { Header } from '../../components/header';
 import { COLORS } from '../../themes/colors';
 import { RATIO_HEADER } from '../../utils/metric';
 import { POST_DATA } from '../../utils/posts';
-const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width, height: SCREEN_HEIGHT } = Dimensions.get('screen');
 export const Home = ({ navigation }: any) => {
   const scrollY = new Animated.Value(0, {
     useNativeDriver: true,
@@ -54,15 +54,16 @@ export const Home = ({ navigation }: any) => {
   };
 
   const [isVisible, setIsVisible] = useState(false);
-  const toggleModal = () => {
-    setIsVisible(prev => !prev);
+  const toggleModal = (value: boolean) => {
+    setIsVisible(value);
   };
-  let Post = useSelector((state: any) => state.postData);
+  let Posts = useSelector((state: any) => state.postDataServer);
+
   return (
     <>
       <SafeAreaView style={styles.main}>
         <Pressable
-          onPress={toggleModal}
+          onPress={() => toggleModal(true)}
           style={{
             position: 'absolute',
             padding: 14,
@@ -105,16 +106,15 @@ export const Home = ({ navigation }: any) => {
         <PagerView
           style={styles.wrapper}
           initialPage={0}
-          pageMargin ={19}
+          pageMargin={19}
           ref={swiperRef}
           onPageSelected={e => {
             setPage(e.nativeEvent.position);
-          }}
-          >
+          }}>
           {/* Building */}
-          <Thread 
+          <Thread
             key={0}
-            POST_DATA={Post}
+            POST_DATA={Posts}
             handleScrollHeader={handleScrollHeader}
             refreshing={refreshing}
             setRefreshing={setRefreshing}

@@ -2,7 +2,6 @@ import React, { memo, useState } from 'react';
 import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
 import { PostSchema } from '../../utils/posts';
 import PostImages from './PostImages';
-import PostVideo from './PostVideo';
 type PostListProps = {
   posts: PostSchema;
 };
@@ -65,13 +64,15 @@ const PostComponent = (props: PostListProps) => {
         </View>
         <View style={{ backgroundColor: 'white', paddingHorizontal: 7 }}>
           <Text
-            style={{
-              color: '#000',
-              fontSize: 14,
-              fontFamily: 'Ubuntu-Regular',
-              marginVertical: 7,
-            }}>
-            {posts.content.toString()}.
+            style={[
+              {
+                color: '#112',
+                fontFamily: 'Ubuntu-Regular',
+                marginVertical: 7,
+              },
+              pics && pics.length > 0 ? { fontSize: 16 } : { fontSize: 17 },
+            ]}>
+            { posts.content.toString()}
           </Text>
         </View>
         <View>

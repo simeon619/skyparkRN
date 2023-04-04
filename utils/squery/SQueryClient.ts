@@ -10,8 +10,9 @@ const SQuery: { [str: string]: any } = {};
 const socket = io('http://192.168.1.2:3500');
 
 (async () => {
+  // await Keychain.resetGenericPassword();
   let u: any = await Keychain.getGenericPassword();
-  console.log(u);
+  console.log({u : u.password});
 
   socket.io.opts.extraHeaders = {
     ...socket.io.opts.extraHeaders,
@@ -20,7 +21,7 @@ const socket = io('http://192.168.1.2:3500');
 })();
 
 socket.on('storeCookie', async cookie => {
-  await Keychain.resetGenericPassword();
+  // await Keychain.resetGenericPassword();
   try {
     await Keychain.setGenericPassword('cookie', cookie);
     socket.io.opts.extraHeaders = {
@@ -142,20 +143,20 @@ const validations :any  = {
       message: isValide ? '' : 'the maximum Length is ' + requirement,
     };
   },
-  min: (value: number, requirement: string | number) => {
-    const isValide = value >= requirement;
-    return {
-      isValide,
-      message: isValide ? '' : 'the minimum value is ' + requirement,
-    };
-  },
-  max: (value: number, requirement: string | number) => {
-    const isValide = value <= requirement;
-    return {
-      isValide,
-      message: isValide ? '' : 'the maximum value is ' + requirement,
-    };
-  },
+  // min: (value: number, requirement: string | number) => {
+  //   const isValide = value >= requirement;
+  //   return {
+  //     isValide,
+  //     message: isValide ? '' : 'the minimum value is ' + requirement,
+  //   };
+  // },
+  // max: (value: number, requirement: string | number) => {
+  //   const isValide = value <= requirement;
+  //   return {
+  //     isValide,
+  //     message: isValide ? '' : 'the maximum value is ' + requirement,
+  //   };
+  // },
   match: (value: string, requirement: string | RegExp) => {
     // console.log(requirement);
     const re = new RegExp(requirement);

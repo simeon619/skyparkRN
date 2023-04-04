@@ -21,8 +21,20 @@ const postDataSlice = createSlice({
       let newState = {  };
       newState = action.payload;
       state.push(newState) ;
-      console.log(state);
-      
+      return state;
+    },
+  },
+});
+
+
+const postDataServerSlice = createSlice({
+  name: 'post',
+  initialState: [],
+  reducers: {
+    addPostServer: (state: any, action) => {
+      console.log('3333@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      state.unshift(action.payload) ;
+
       return state;
     },
   },
@@ -46,10 +58,12 @@ const postDataSlice = createSlice({
 export const store = configureStore({
   reducer: {
     dataUser: userDataSlice.reducer,
-    postData : postDataSlice.reducer
+    postData : postDataSlice.reducer,
+    postDataServer : postDataServerSlice.reducer
   },
 });
 
 export const { addInfoUser } = userDataSlice.actions;
 export const { addPost } = postDataSlice.actions;
+export const { addPostServer } = postDataServerSlice.actions;
 export type RootState = ReturnType<typeof store.getState>;

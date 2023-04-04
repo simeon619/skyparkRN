@@ -22,7 +22,7 @@ const Start = () => {
       <StoreProvider store={store}>
         <PaperProvider >
           <Stack.Navigator
-            initialRouteName="Infoprofile"
+            initialRouteName="Login"
             screenOptions={{
               headerShown: false,
               animation: 'slide_from_right',

@@ -3,6 +3,7 @@ import { createRandomPosts } from './RandomPost';
 type Author = {
   name: string;
   picture: string;
+  id : string
 };
 
 type Comment = {
