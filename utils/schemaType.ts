@@ -7,10 +7,10 @@ type RootStackParamList = {
   ItemActivity: undefined;
   Infoperso: undefined;
   Infoprofile: undefined;
-  drawer: undefined;
+  Drawer: undefined;
   Formlogin: undefined;
-  bottomTabs: undefined;
-  Stack : undefined
+  BottomTabs: undefined;
+  Stack: undefined;
 };
 
 export type PropsNavigation = {

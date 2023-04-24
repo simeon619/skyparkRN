@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {
   Dimensions,
@@ -5,32 +6,54 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  View
+  View,
 } from 'react-native';
+import { useSelector } from 'react-redux';
 import { COLORS } from '../themes/colors';
-import { RATIO_HEADER } from '../utils/metric';
+import { HOST, RATIO_HEADER } from '../utils/metric';
 // import { PropsNaivation } from '../utils/schemaType';
 
-const { width, height } = Dimensions.get('window');
-export const Header = ({ navigation , page, onSwitchPage }: {
-  navigation : any , page : number , onSwitchPage :(index: number) => void 
+const { height, width } = Dimensions.get('window');
+export const Header = ({
+  navigation,
+  page,
+  onSwitchPage,
+}: {
+  navigation: any;
+  page: number;
+  onSwitchPage: (index: number) => void;
 }) => {
-
-
+  let User = useSelector((state: any) => state.dataUser);
   return (
     <>
       <View style={styles.topHeader}>
-        <Pressable onPress={()=>{navigation.openDrawer();}} style={{ alignSelf: 'center' }}>
-          <Image
-            style={styles.avatar}
-            source={require('../assets/images/user.png')}
-          />
+        <Pressable
+          onPress={() => {
+            navigation.openDrawer();
+          }}
+          style={{ alignSelf: 'center' }}>
+          {User?.imgProfile ? (
+            <Image
+              style={styles.avatar}
+              resizeMode="contain"
+              source={
+                User.imgProfile[0]
+                  ? { uri: HOST + User.imgProfile[0] }
+                  : require('../assets/images/user.png')
+              }
+            />
+          ) : (
+            <Image
+              style={styles.avatar}
+              resizeMode="contain"
+              source={require('../assets/images/user.png')}
+            />
+          )}
         </Pressable>
         <Pressable onPress={() => {}} style={{ alignSelf: 'center' }}>
           <Text
             style={{
-              fontSize: 30,
+              fontSize: width * 0.05,
               color: 'black',
               fontFamily: 'Kurale-Regular',
               marginRight: 55,
@@ -38,9 +61,7 @@ export const Header = ({ navigation , page, onSwitchPage }: {
             Skypark
           </Text>
         </Pressable>
-        <Pressable
-          onPress={() => {}}
-          style={{ alignSelf: 'flex-start' }}></Pressable>
+        <Pressable onPress={() => {}} style={{ alignSelf: 'flex-start' }} />
       </View>
       <View style={styles.bottomHeader}>
         <Pressable onPress={() => onSwitchPage(0)}>
@@ -80,7 +101,7 @@ export const Header = ({ navigation , page, onSwitchPage }: {
               page === 1
                 ? {
                     borderBottomColor: COLORS.blue,
-    
+
                     color: COLORS.black,
                   }
                 : {},
@@ -95,9 +116,10 @@ export const Header = ({ navigation , page, onSwitchPage }: {
 
 const styles = StyleSheet.create({
   avatar: {
-    height: (RATIO_HEADER * height) / 100 / 2.9,
-    width: (RATIO_HEADER * height) / 100 / 2.9,
+    height: (RATIO_HEADER * height) / 100 / 2.5,
+    width: (RATIO_HEADER * height) / 100 / 2.5,
     alignSelf: 'stretch',
+    borderRadius: 20,
   },
 
   shop: {
@@ -121,7 +143,7 @@ const styles = StyleSheet.create({
   topHeader: {
     height: (RATIO_HEADER * height) / 100 / 1.8,
     borderBottomColor: '#0012',
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.4,
     flexDirection: 'row',
     // justifyContent: 'space-between',
     gap: 20,

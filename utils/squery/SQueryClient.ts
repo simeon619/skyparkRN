@@ -1,18 +1,15 @@
 import * as Keychain from 'react-native-keychain';
 import { io } from 'socket.io-client';
-import {
-  createModelFrom,
-  getDesription,
-  getDesriptions,
-} from './SQueryUtils';
+import { createModelFrom, getDesription, getDesriptions } from './SQueryUtils';
+import { HOST } from '../metric';
 const SQuery: { [str: string]: any } = {};
 
-const socket = io('http://192.168.1.2:3500');
+const socket = io(HOST);
 
 (async () => {
   // await Keychain.resetGenericPassword();
   let u: any = await Keychain.getGenericPassword();
-  console.log({u : u.password});
+  console.log({ u: u.password });
 
   socket.io.opts.extraHeaders = {
     ...socket.io.opts.extraHeaders,
@@ -20,32 +17,49 @@ const socket = io('http://192.168.1.2:3500');
   };
 })();
 
-socket.on('storeCookie', async cookie => {
+socket.on('storeCookie', async (cookie, cb) => {
   // await Keychain.resetGenericPassword();
   try {
-    await Keychain.setGenericPassword('cookie', cookie);
+    let result = await Keychain.setGenericPassword('squery_session', cookie);
     socket.io.opts.extraHeaders = {
       ...socket.io.opts.extraHeaders,
       cookie,
     };
-
+    cb(result);
   } catch (error) {
     // console.log('Error storing cookie:', error);
   }
 });
 
+SQuery.CurrentUserInstance = async () => {
+  return await new Promise(rev => {
+    SQuery.emit('server:currentUser', {}, async (res: any) => {
+      if (res.error) {
+        throw new Error(JSON.stringify(res));
+      }
+      const userModel = await SQuery.Model(res.response.signup.modelPath);
+      if (!userModel) {
+        throw new Error('Model is null for modelPath : ' + res.modelPath);
+      }
+      const userInstance = await userModel.newInstance({
+        id: res.response.signup.id,
+      });
+      rev(userInstance);
+    });
+  });
+};
 SQuery.socket = socket;
-
 SQuery.Model = async (modelPath: string) => {
   return await createModelFrom(modelPath);
 };
 SQuery.emitNow = (event: string, ...arg: any[]) => {
-  if (typeof event != 'string')
+  if (typeof event !== 'string') {
     throw new Error(
       'cannot emit with following event : ' +
         event +
         '; event value must be string',
     );
+  }
   if (SQuery.socket.connected) {
     socket.emit(event, ...arg);
   } else {
@@ -53,40 +67,29 @@ SQuery.emitNow = (event: string, ...arg: any[]) => {
   }
 };
 SQuery.emit = (event: string, ...arg: string[]) => {
-  if (typeof event != 'string')
+  if (typeof event !== 'string') {
     throw new Error(
       'cannot emit with following event : ' +
         event +
         '; event value must be string',
     );
+  }
   socket.emit(event, ...arg);
 };
 
 SQuery.on = (event: string, cb: (...args: any[]) => void) => {
-  if (typeof event != 'string')
+  if (typeof event !== 'string') {
     throw new Error(
       'cannot emit with following event : ' +
         event +
         '; event value must be string',
     );
+  }
   socket.on(event, cb);
 };
 SQuery.getDesription = getDesription;
 SQuery.getDesriptions = getDesriptions;
 
-// const ActionsMap = {
-//     String: {
-//         lowerCase: (value, requirement) => {
-//             return requirement ? value.toLowerCase() : value;
-//         },
-//         upperCase: (value, requirement) => {
-//             return requirement ? value.toUpperCase() : value;
-//         },
-//         trim: (value, requirement) => {
-//             return requirement ? value.trim() : value;
-//         },
-//     }
-// }
 const ValidationMap: { [str: string]: any } = {
   String: ['minlength', 'maxlength', 'match', 'enum', 'required'],
   Number: ['min', 'max', 'enum', 'required'],
@@ -102,12 +105,16 @@ function isValideType(ruleTypes: any, type: String) {
   ruleTypes.forEach((ruleType: any) => {
     const ruleSide = ruleType.split('/');
     const match = (side: number) => {
-      if (ruleSide[side] == '*') return true;
-      else if (
-        ruleSide[side].toLocaleLowerCase() == typeSide[side].toLocaleLowerCase()
-      )
+      if (ruleSide[side] === '*') {
         return true;
-      else return false;
+      } else if (
+        ruleSide[side].toLocaleLowerCase() ===
+        typeSide[side].toLocaleLowerCase()
+      ) {
+        return true;
+      } else {
+        return false;
+      }
     };
 
     if (match(0) && match(1)) {
@@ -117,7 +124,7 @@ function isValideType(ruleTypes: any, type: String) {
   return valide;
 }
 
-const validations :any  = {
+const validations: any = {
   minlength: (value: any, requirement: any) => {
     let isValide = false;
 
@@ -143,20 +150,20 @@ const validations :any  = {
       message: isValide ? '' : 'the maximum Length is ' + requirement,
     };
   },
-  // min: (value: number, requirement: string | number) => {
-  //   const isValide = value >= requirement;
-  //   return {
-  //     isValide,
-  //     message: isValide ? '' : 'the minimum value is ' + requirement,
-  //   };
-  // },
-  // max: (value: number, requirement: string | number) => {
-  //   const isValide = value <= requirement;
-  //   return {
-  //     isValide,
-  //     message: isValide ? '' : 'the maximum value is ' + requirement,
-  //   };
-  // },
+  min: (value: number, requirement: number) => {
+    const isValide = value >= requirement;
+    return {
+      isValide,
+      message: isValide ? '' : 'the minimum value is ' + requirement,
+    };
+  },
+  max: (value: number, requirement: number) => {
+    const isValide = value <= requirement;
+    return {
+      isValide,
+      message: isValide ? '' : 'the maximum value is ' + requirement,
+    };
+  },
   match: (value: string, requirement: string | RegExp) => {
     // console.log(requirement);
     const re = new RegExp(requirement);
@@ -189,22 +196,24 @@ const validations :any  = {
     return true;
   },
   type: async (value: any, requirement: string) => {
-    if (requirement == 'Boolean') {
+    if (requirement === 'Boolean') {
       if (
-        value == 'true' ||
-        value == 'false' ||
+        value === 'true' ||
+        value === 'false' ||
         value === true ||
         value === false
-      )
+      ) {
         return { isValide: true };
+      }
       return {
         isValide: false,
         message: 'the type of value bust be : ' + requirement,
       };
-    } else if (requirement == 'Number') {
+    } else if (requirement === 'Number') {
       try {
-        if (!Number.isNaN(Number(value)))
+        if (!Number.isNaN(Number(value))) {
           return { isValide: true, err: Number(value) };
+        }
         return {
           isValide: false,
           message: 'the type of value bust be : ' + requirement,
@@ -215,13 +224,15 @@ const validations :any  = {
           message: 'the type of value bust be : ' + requirement,
         };
       }
-    } else if (requirement == 'String') {
+    } else if (requirement === 'String') {
       return {
         isValide: true,
       };
-    } else if (requirement == 'Date') {
+    } else if (requirement === 'Date') {
       try {
-        if (new Date(value)) return { isValide: true };
+        if (new Date(value)) {
+          return { isValide: true };
+        }
         return {
           isValide: false,
           message: 'the type of value bust be : ' + requirement,
@@ -232,10 +243,12 @@ const validations :any  = {
           message: 'the type of value bust be : ' + requirement,
         };
       }
-    } else if (requirement == 'array') {
+    } else if (requirement === 'array') {
       ////////////////////////////////////////
       try {
-        if (Array.isArray(value)) return { isValide: true };
+        if (Array.isArray(value)) {
+          return { isValide: true };
+        }
         return {
           isValide: false,
           message: 'the type of value bust be : ' + requirement,
@@ -246,7 +259,7 @@ const validations :any  = {
           message: 'the type of value bust be : ' + requirement,
         };
       }
-    } else if (requirement == 'ObjectId') {
+    } else if (requirement === 'ObjectId') {
       try {
         return {
           isValide: await new Promise(rev => {
@@ -275,7 +288,7 @@ const validations :any  = {
     let isValide = true;
     if (requirement) {
       isValide =
-        value == undefined || value == null || value == '' ? false : true;
+        value === undefined || value == null || value === '' ? false : true;
     }
     return {
       isValide,
@@ -284,17 +297,15 @@ const validations :any  = {
   },
 };
 
-SQuery.Validatior = async (
-  rule: any,
-  value: any,
-) => {
+SQuery.Validatior = async (rule: any, value: any) => {
   let res = await validations.type(value, rule.type);
-//   console.log('rule : ', rule, 'value : ', value, 'res: ', res);
-  if (!res.isValide)
+  //   console.log('rule : ', rule, 'value : ', value, 'res: ', res);
+  if (!res.isValide) {
     return {
       message: res.message,
-    //   e: console.log('res: ', { res }),
+      //   e: console.log('res: ', { res }),
     };
+  }
 
   if (ValidationMap[rule.type]) {
     for (const p of ValidationMap[rule.type]) {
@@ -305,20 +316,22 @@ SQuery.Validatior = async (
         //   'value : ',
         //   validations[p](value, rule[p]),
         // );
-        if (!(res = validations[p](value, rule[p])).isValide)
+        if (!(res = validations[p](value, rule[p])).isValide) {
           return {
             message: res.message,
             // e: console.log('res: ', { res }),
           };
+        }
       }
     }
   }
   if (rule.file) {
-    if (!(res = validations.file(value, rule.file)).isValide)
+    if (!(res = validations.file(value, rule.file)).isValide) {
       return {
         message: res.message,
         // e: console.log('res: ', { res }),
       };
+    }
   }
 
   // if (ActionsMap[rule.type]) {

@@ -1,12 +1,14 @@
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
 
-import Conversation from '../../screen/Conversation';
+import Conversation from '../../screen/Conversations';
 import { Home } from '../../screen/Home/Home';
+import ItemActivity from '../../screen/ItemActivity';
 import Notification from '../../screen/Notification';
 import Search from '../../screen/Search';
-import ItemActivity from '../../screen/ItemActivity';
 
 const Tab = createBottomTabNavigator();
 export const BottomTabs = () => {
@@ -14,7 +16,7 @@ export const BottomTabs = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { backgroundColor: '#fff', borderTopWidth: 0 },
+        tabBarStyle: { backgroundColor: '#fff', borderTopWidth: 1 },
         tabBarShowLabel: false,
       }}>
       <Tab.Screen
@@ -107,6 +109,9 @@ export const BottomTabs = () => {
           },
         }}
       />
+      {/* <Tab.Navigator screenOptions={{}}>
+        <Tab.Screen name="discussion" component={Discussion} />
+      </Tab.Navigator> */}
     </Tab.Navigator>
   );
 };

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useImperativeHandle } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -8,7 +9,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { COLORS } from '../themes/colors';
+// import { COLORS } from '../themes/colors';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -50,13 +51,12 @@ const BottomSheet = React.forwardRef<BottomSheetRefProps, BottomSheetProps>(
       })
       .onUpdate(event => {
         translateY.value = event.translationY + context.value.y;
-        translateY.value = Math.max(translateY.value, MAX_TRANSLATE_Y);
+        translateY.value = Math.max(translateY.value, MAX_TRANSLATE_Y / 1.8);
       })
       .onEnd(() => {
         if (translateY.value > -SCREEN_HEIGHT / 1.5) {
           scrollTo(0);
           console.log('descend');
-          
         } else if (translateY.value < -SCREEN_HEIGHT / 3) {
           scrollTo(MAX_TRANSLATE_Y);
         }
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   bottomSheetContainer: {
     height: SCREEN_HEIGHT,
     width: '101%',
-    backgroundColor: '#0c4a6efe',
+    backgroundColor: '#444',
     position: 'absolute',
     top: SCREEN_HEIGHT,
     borderRadius: 25,

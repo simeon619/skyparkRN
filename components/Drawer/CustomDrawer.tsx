@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import {
   DrawerContentScrollView,
   DrawerItemList,
@@ -11,9 +12,13 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSelector } from 'react-redux';
 import { COLORS } from '../../themes/colors';
+import { HOST } from '../../utils/metric';
 const SIZE_PICTURE = 70;
+
 const CustomDrawer = (props: any) => {
+  const User = useSelector((state: any) => state.dataUser);
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <ImageBackground
@@ -26,18 +31,28 @@ const CustomDrawer = (props: any) => {
             alignItems: 'flex-start',
             borderRadius: 10,
           }}>
-          <Image
-            source={require('../../assets/images/user.png')}
-            style={styles.avatar}
-          />
+          {User.imgProfile ? (
+            <Image
+              style={styles.avatar}
+              resizeMode="contain"
+              source={{ uri: HOST + User.imgProfile[0] }}
+            />
+          ) : (
+            <Image
+              style={styles.avatar}
+              resizeMode="contain"
+              source={require('../../assets/images/user.png')}
+            />
+          )}
           <Text
             style={{
               color: COLORS.black,
               fontSize: 20,
               alignSelf: 'flex-start',
               fontWeight: '800',
+              fontFamily: 'Ubuntu-Regular',
             }}>
-            Jules Gregroire
+            {User.name}
           </Text>
           <Text
             style={{

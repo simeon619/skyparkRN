@@ -1,31 +1,58 @@
-import LottieView from 'lottie-react-native';
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import FormLogin from '../../layouts/Formlogin';
 import { COLORS } from '../../themes/colors';
-
+const { width, height } = Dimensions.get('window');
 export const Login = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
-      <View style={styles.containerSvg}>
-        <LottieView
-          source={require('../../assets/images/f2.json')}
-          autoSize={true}
-          style={{
-            height: '90%',
-            marginLeft: '4%',
-            backgroundColor: COLORS.backgroundLogin,
-          }}
-          resizeMode={'cover'}
-          autoPlay
-          loop={true}
+      <StatusBar hidden />
+      <View style={{ flex: 4 }}>
+        <Image
+          resizeMode="cover"
+          style={{ width, height }}
+          source={require('../../assets/images/banner.jpg')}
         />
-        <Text style={styles.textwelcome}>BIENVENUE !!!</Text>
+      </View>
+      <View
+        style={{
+          height: height * 0.2,
+          alignSelf: 'flex-start',
+          marginHorizontal: 20,
+          rowGap: 5,
+          justifyContent: 'center',
+          paddingHorizontal: 10,
+        }}>
+        <Text
+          style={{ fontFamily: 'Ubuntu-Bold', fontSize: 40, color: '#eee' }}>
+          Login
+        </Text>
+        <Text
+          style={{ fontFamily: 'Ubuntu-Bold', fontSize: 20, color: '#ccc' }}>
+          Please sign in to continue.
+        </Text>
       </View>
       <View style={styles.containerForm}>
         <FormLogin navigation={navigation} />
+        <View style={styles.gotoregister}>
+          <Text style={styles.simple}>Don't have an account ?</Text>
+          <Text
+            style={styles.link}
+            onPress={() => {
+              navigation.navigate('Signup');
+            }}>
+            Sign up
+          </Text>
+        </View>
       </View>
-    
     </View>
   );
 };
@@ -36,22 +63,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.backgroundLogin,
   },
-  containerSvg: {
-    flex: 3,
-    width: '100%',
-    alignItems: 'center',
-    backgroundColor: COLORS.backgroundLogin,
-  },
   containerForm: {
     width: '95%',
-    flex: 4,
-    backgroundColor: COLORS.backgroundLogin,
+    height: height * 0.6,
+    backgroundColor: '#0008',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    // backgroundColor: COLORS.backgroundLogin,
   },
   textwelcome: {
     fontSize: 30,
     color: COLORS.blue,
     bottom: 15,
-    fontFamily: 'Kurale-Regular',
+    fontFamily: 'Roboto-Regular',
   },
   forgetpsswd: {
     alignSelf: 'center',
@@ -62,5 +86,27 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     position: 'absolute',
     bottom: 10,
+  },
+  gotoregister: {
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 20,
+    flexWrap: 'wrap',
+    gap: 5,
+    alignSelf: 'center',
+    alignItems: 'baseline',
+  },
+
+  simple: {
+    fontFamily: 'Kurale-Regular',
+    fontSize: 18,
+    color: '#bbb',
+  },
+  link: {
+    color: COLORS.blue,
+    fontWeight: '900',
+    // textDecorationLine: 'underline',
+    fontFamily: 'Kurale-Regular',
+    fontSize: 16,
   },
 });

@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react/self-closing-comp */
+
+/* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
 import {
   Dimensions,
@@ -7,14 +11,16 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSelector } from 'react-redux';
 import { COLORS } from '../../themes/colors';
-import PostModal from '../PostModal';
+import { HOST } from '../../utils/metric';
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const HeaderProfile = () => {
+const HeaderProfile = ({ navigation }: { navigation: any }) => {
   const [isVisible, setIsVisible] = useState(false);
   const toggleModal = () => {
     setIsVisible(prev => !prev);
   };
+  let User = useSelector((state: any) => state.dataUser);
   return (
     <View style={{ backgroundColor: 'white' }}>
       <Image
@@ -32,12 +38,24 @@ const HeaderProfile = () => {
               width: 90,
               height: 90,
               borderRadius: 99,
+              borderColor: 'white',
+              borderWidth: 1,
+              alignSelf: 'center',
               transform: [{ translateY: -50 }],
             }}>
-            <Image
-              style={{ width: '100%', height: '100%', paddingHorizontal: 20 }}
-              source={require('../../assets/images/user.png')}
-            />
+            {User.imgProfile ? (
+              <Image
+                style={styles.avatar}
+                resizeMode="contain"
+                source={{ uri: HOST + User.imgProfile[0] }}
+              />
+            ) : (
+              <Image
+                style={styles.avatar}
+                resizeMode="contain"
+                source={require('../../assets/images/user.png')}
+              />
+            )}
           </View>
           <Text
             style={{
@@ -47,7 +65,7 @@ const HeaderProfile = () => {
               fontWeight: '700',
               transform: [{ translateY: -40 }],
             }}>
-            Jean gnagniri
+            {User.name}
           </Text>
         </View>
 
@@ -75,7 +93,7 @@ const HeaderProfile = () => {
               height: 35,
               width: 2,
               backgroundColor: COLORS.blue,
-              transform: [{ translateY: 10  }],
+              transform: [{ translateY: 10 }],
             }}></View>
           <View style={[styles.icon]}>
             <Image
@@ -99,7 +117,7 @@ const HeaderProfile = () => {
             style={styles.icon1}
             source={require('../../assets/images/activityUser.png')}
           />
-          <Text style={styles.text}>Profile</Text>
+          <Text style={styles.text}>Activity</Text>
         </View>
         <View style={{ alignItems: 'center' }}>
           <Image
@@ -126,12 +144,28 @@ const HeaderProfile = () => {
           transform: [{ translateY: -SCREEN_HEIGHT * 0.05 }],
         }}>
         <View style={styles.icon3}>
-          <Image
-            style={{ width: '100%', height: '100%' }}
-            source={require('../../assets/images/user.png')}
-          />
+          {User.imgProfile ? (
+            <Image
+              style={{
+                width: width * 0.13,
+                height: width * 0.13,
+                borderRadius: 99,
+              }}
+              resizeMode="contain"
+              source={{ uri: HOST + User.imgProfile[0] }}
+            />
+          ) : (
+            <Image
+              style={{ width: width * 0.15, height: width * 0.15 }}
+              resizeMode="contain"
+              source={require('../../assets/images/user.png')}
+            />
+          )}
         </View>
-        <TouchableOpacity onPress={toggleModal}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.getParent().navigate('post', { user: '' });
+          }}>
           <View
             style={{
               borderColor: 'grey',
@@ -147,12 +181,12 @@ const HeaderProfile = () => {
                 color: '#555',
                 fontSize: 18,
               }}>
-              What's new Jean ?
+              What's new {User.name.split(' ')[0]}?
             </Text>
           </View>
         </TouchableOpacity>
       </View>
-      {<PostModal toggleModal={toggleModal} isShow={isVisible} />}
+      {/* {<PostModal toggleModal={toggleModal} isShow={isVisible} />} */}
     </View>
   );
 };
@@ -165,9 +199,17 @@ const styles = StyleSheet.create({
     height: 27,
     tintColor: COLORS.blue,
   },
+  avatar: {
+    paddingTop: 20,
+    height: 90,
+    width: 90,
+    borderRadius: 100,
+    padding: 20,
+  },
   icon3: {
-    width: width * 0.1,
-    height: width * 0.1,
+    // width: width * 0.15,
+    // height: width * 0.15,
+    borderRadius: 99,
     tintColor: COLORS.blue,
   },
   text: {
@@ -181,8 +223,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     borderBottomColor: COLORS.blue,
-    borderBottomWidth: 2,
-    elevation: 10,
+    borderBottomWidth: 0,
+    // elevation: 10,
     alignSelf: 'center',
     transform: [{ translateY: -SCREEN_HEIGHT * 0.08 }],
   },

@@ -1,15 +1,18 @@
 import EventEmiter from './event/eventEmiter';
 import SQuery from './SQueryClient';
 
+const InstanceCache: any = {};
+const ArrayCache: any = {};
 export const Descriptions: { [str: string]: any } = {};
 
 export async function getDesription(modelPath: string): Promise<any> {
-  if (typeof modelPath != 'string')
+  if (typeof modelPath !== 'string') {
     throw new Error(
       'getDesription(' +
         modelPath +
         ') is not permit, parameter must be string',
     );
+  }
   if (Descriptions[modelPath]) {
     return Descriptions[modelPath];
   }
@@ -22,7 +25,9 @@ export async function getDesription(modelPath: string): Promise<any> {
       },
       (res: any) => {
         // console.log('server:description', res);
-        if (res.error) throw new Error(JSON.stringify(res));
+        if (res.error) {
+          throw new Error(JSON.stringify(res));
+        }
         Descriptions[modelPath] = res.response;
         //console.log('********************', res);
         rev(Descriptions[modelPath]);
@@ -33,7 +38,9 @@ export async function getDesription(modelPath: string): Promise<any> {
 export async function getDesriptions() {
   const descriptions: any = await new Promise(rev => {
     SQuery.socket.emit('server:descriptions', {}, (res: any) => {
-      if (res.error) throw new Error(JSON.stringify(res));
+      if (res.error) {
+        throw new Error(JSON.stringify(res));
+      }
       //console.log('88888888888888888888888888', res);
       rev(res.response);
     });
@@ -53,7 +60,9 @@ export async function createModelFrom(modelPath: string) {
   Model.create = async (data: any, errorCb: (e: any) => void) => {
     ///// verifier si chaque donner est bien rentrer
 
-    if (!errorCb) errorCb = (e: any) => console.error(e);
+    if (!errorCb) {
+      errorCb = (e: any) => console.error(e);
+    }
     const validation = await SQuery.Validatior(description, data);
     if (validation.message) {
       // console.error(validation);
@@ -88,7 +97,9 @@ export async function createModelFrom(modelPath: string) {
   };
   /** ****************      Instance      ******************* */
   Model.newInstance = async (data: { id: any }, errorCb: (e: any) => void) => {
-    if (!errorCb) errorCb = (e: any) => console.error(e);
+    if (!errorCb) {
+      errorCb = (e: any) => console.error(e);
+    }
     let instance = null;
     try {
       try {
@@ -107,7 +118,9 @@ export async function createModelFrom(modelPath: string) {
     { childInstance, childId }: any,
     errorCb: (e: any) => void,
   ) => {
-    if (!errorCb) errorCb = (e: any) => console.error(e);
+    if (!errorCb) {
+      errorCb = (e: any) => console.error(e);
+    }
     let parentInstance = null;
     let parentModelPath;
     let parentId;
@@ -120,8 +133,8 @@ export async function createModelFrom(modelPath: string) {
     }
     try {
       try {
-        parentId = await childInstance['$parentId'];
-        parentModelPath = await childInstance['$parentModelPath'];
+        parentId = await childInstance.$parentId;
+        parentModelPath = await childInstance.$parentModelPath;
         const parentModel = await SQuery.Model(parentModelPath);
         parentInstance = parentModel.newInstance({ id: parentId });
       } catch (e) {
@@ -134,7 +147,7 @@ export async function createModelFrom(modelPath: string) {
     return parentInstance;
   };
   Model.update = async (data: any) => {
-    return await new Promise((rev, rej) => {
+    return await new Promise(rev => {
       try {
         SQuery.emitNow(
           'model_' + modelPath + ':update',
@@ -165,13 +178,19 @@ export async function createModelFrom(modelPath: string) {
   return Model;
 }
 export async function createInstanceFrom({ modelPath, id, Model }: any) {
+  if (!id || !modelPath) {
+    if (modelPath !== 'file') {
+      console.error('id = ' + id, 'modelPath = ' + modelPath);
+    }
+    return null;
+  }
+  if (InstanceCache[modelPath + ':' + id]) {
+    return InstanceCache[modelPath + ':' + id];
+  }
   let cache: any = {};
   let propertyCache: any = {};
   const instance: any = {};
-  if (!id || !modelPath) {
-    console.error('id = ' + id, 'modelPath = ' + modelPath);
-    return null;
-  }
+
   const description = await getDesription(modelPath);
   description._id = {
     type: 'String',
@@ -187,8 +206,10 @@ export async function createInstanceFrom({ modelPath, id, Model }: any) {
           id: id,
         },
         async (res: { error: any; response: {} }) => {
-          if (res.error) throw new Error(JSON.stringify(res));
-        //   console.log('--> response:' + 'model_' + modelPath + ':read', res);
+          if (res.error) {
+            throw new Error(JSON.stringify(res));
+          }
+          //   console.log('--> response:' + 'model_' + modelPath + ':read', res);
           cache = res.response;
           lastInstanceUpdateAt = cache.updatedAt;
           //  await emitRefresh()
@@ -200,7 +221,7 @@ export async function createInstanceFrom({ modelPath, id, Model }: any) {
   SQuery.on(
     'update:' + cache._id,
     async (data: { doc: { updatedAt?: any }; properties: any }) => {
-    //   console.log('+++++++++++++ 1 ++++++++++++++', data);
+      //   console.log('+++++++++++++ 1 ++++++++++++++', data);
       // console.log('last : ' + lastInstanceUpdateAt, 'data update At  :' + data.doc.updatedAt);
       // console.log('now : ' + lastInstanceUpdateAt, 'data update At  :' + data.doc.updatedAt);
       // console.log('data.properties : ' + data.properties);
@@ -220,7 +241,7 @@ export async function createInstanceFrom({ modelPath, id, Model }: any) {
     } else {
       for (const p in description) {
         if (Object.hasOwnProperty.call(description, p)) {
-        //   console.log('+++++++++++++ 3 ++++++++++++++', p, await instance[p]);
+          //   console.log('+++++++++++++ 3 ++++++++++++++', p, await instance[p]);
           emiter.emit('refresh:' + p, await instance[p]);
         }
       }
@@ -244,10 +265,6 @@ export async function createInstanceFrom({ modelPath, id, Model }: any) {
                 });
                 lastPropertyUpdateAt = lastInstanceUpdateAt;
                 firstRead = false;
-                // console.log('get:propertyCache[' + property + ']', {
-                //   propertyCache,
-                //   cache,
-                // });
               }
               return propertyCache[property];
             } else if (rule[0] && rule[0].ref) {
@@ -260,19 +277,7 @@ export async function createInstanceFrom({ modelPath, id, Model }: any) {
                   description,
                   Model,
                 });
-                propertyCache[property].when('refresh', async () => {
-                //   console.log(
-                //     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ array emit  refresh  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
-                //   );
-                  // await emitRefresh([property]);
-                });
-                instance.when('refresh:' + property, (value: any) => {
-                //   console.log(
-                //     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ array emit  refresh  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
-                //     { value },
-                //   );
-                  propertyCache[property].update();
-                });
+
                 firstRead = false;
               }
               return propertyCache[property];
@@ -295,8 +300,9 @@ export async function createInstanceFrom({ modelPath, id, Model }: any) {
             }
           },
           set: async function (value) {
-           
-            if (value == cache[property]) return;
+            if (value == cache[property]) {
+              return;
+            }
             if (rule.ref) {
               //vouloire changer l'id stocker dans une proprieter, cella de doit etre permis ou non
               //return console.error('ReadOnly modelInstance["refProperty"], Exemple: const modelInstance =  await modelInstance["refProperty"] ');
@@ -313,16 +319,16 @@ export async function createInstanceFrom({ modelPath, id, Model }: any) {
                     fileName: file.name || file.fileName,
                     size: file.size,
                     type: file.type || file.mime,
-                    buffer: file.buffer || await file.arrayBuffer(),
+                    buffer: file.buffer || (await file.arrayBuffer?.()),
+                    encoding: file.encoding,
                   };
-                  console.log({...fileData , buffer :'null'}, "filedata");
-                  
+                  console.log({ ...fileData, buffer: 'null' }, 'filedata');
+
                   files.push(fileData);
                 }
               }
               value = files;
-              console.log('value',{...value[0] , buffer :'null'} , 'value');
-              
+              console.log('value', { ...value[0], buffer: 'null' }, 'value');
             }
             const result = await SQuery.Validatior(
               description[property],
@@ -350,8 +356,8 @@ export async function createInstanceFrom({ modelPath, id, Model }: any) {
     }
   }
   instance.update = async (data: any) => {
-    console.log('avant emit now',{data ,id , modelPath});
-    
+    console.log('avant emit now', { data, id, modelPath });
+
     SQuery.emitNow(
       'model_' + modelPath + ':update',
       {
@@ -362,8 +368,8 @@ export async function createInstanceFrom({ modelPath, id, Model }: any) {
         if (res.error) {
           throw new Error(JSON.stringify(res));
         }
-        console.log('response',res);
-        
+        console.log('response', res);
+
         cache = res.response;
       },
     );
@@ -375,6 +381,43 @@ export async function createInstanceFrom({ modelPath, id, Model }: any) {
   ) => {
     emiter.when(events, listener, changeRequired);
   };
+
+  instance.extractor = async (extractorPath: any) => {
+    if (extractorPath == './') {
+      return instance;
+    }
+    if (extractorPath == '../') {
+      return await instance.newParentInstance();
+    }
+    return await new Promise(rev => {
+      SQuery.emit(
+        'server:extractor',
+        {
+          modelPath,
+          id,
+          extractorPath,
+        },
+        async (res: any) => {
+          if (res.error) {
+            throw new Error(JSON.stringify(res));
+          }
+          console.log(res);
+          const extractedModel = await SQuery.Model(res.response.modelPath);
+          if (!extractedModel) {
+            throw new Error(
+              'extractedModel is null for modelPath : ' +
+                res.response.modelPath,
+            );
+          }
+          const extractedInstance = await extractedModel.newInstance({
+            id: res.response.id,
+          });
+          rev(extractedInstance);
+        },
+      );
+    });
+  };
+
   const parts = (await instance.__parentModel).split('_');
   instance.$modelPath = modelPath;
   instance.$parentModelPath = parts[0];
@@ -385,7 +428,7 @@ export async function createInstanceFrom({ modelPath, id, Model }: any) {
   instance.newParentInstance = async () => {
     return Model.newParentInstance({ childInstance: instance });
   };
- 
+
   return instance;
 }
 export async function createArrayInstanceFrom({
@@ -393,7 +436,11 @@ export async function createArrayInstanceFrom({
   id: parentId,
   property,
   description,
+  Model,
 }: any) {
+  if (ArrayCache[parentModel + '/' + property + ':' + parentId]) {
+    return ArrayCache[parentModel + '/' + property + ':' + parentId];
+  }
   let currentData: any = null;
   const emiter = new EventEmiter();
   /**
@@ -410,25 +457,45 @@ export async function createArrayInstanceFrom({
   let itemModelPath = '';
   try {
     itemModelPath = description[property][0].ref;
-    if (!itemModelPath)
+    if (!itemModelPath) {
       throw new Error(
         'Cannot create a Array Instance with a following description, modelPath = ' +
           itemModelPath,
       );
+    }
   } catch (error: any) {
     throw new Error(error.message);
   }
 
   const arrayInstance: any = {};
+  SQuery.on(
+    'list/' + parentModel + '/' + property + ':' + parentId,
+    async (data: any) => {
+      const modifData = {
+        added: data.added,
+        remove: data.remove,
+      };
+      Object.defineProperties(modifData, {
+        arrayData: {
+          get: async () => {
+            return await refresh();
+          },
+          set: async () => {
+            throw new Error('Read Only Property');
+          },
+        },
+      });
+      console.log('~ ~ ~ ~ ~ ~ ' + { modifData });
+      emiter.emit('update', modifData);
+    },
+  );
   const refresh = async (
     options?:
       | { remove?: any; addNew?: any; addId?: any; paging?: any; opi?: any }
       | undefined,
   ) => {
     options = options || {};
-    let canRefresh = options.remove || options.addNew || options.addId;
     if (options.paging) {
-      canRefresh = true;
       options.paging = paging = {
         ...paging,
         ...options.paging,
@@ -442,7 +509,8 @@ export async function createArrayInstanceFrom({
     }
     // console.log('@@@@@@@@@@@@@@@@@@@@@@@option : ', options);
     options.paging.query = {
-      __parentModel: parentModel + '_' + parentId + '_' + property,
+      __parentModel:
+        parentModel + '_' + parentId + '_' + property + '_' + itemModelPath,
     };
     // console.log('#####################option : ', options);
 
@@ -454,50 +522,48 @@ export async function createArrayInstanceFrom({
             ...options,
             property,
           },
-          async (res: { error: any; response: any }) => {
-            if (res.error) throw new Error('****=> ' + JSON.stringify(res));
+          async (res: any) => {
+            if (res.error) {
+              throw new Error('****=> ' + JSON.stringify(res));
+            }
             currentData = res.response;
             paging.page = currentData.page;
             paging.limit = currentData.limit;
-            emiter.emit('dataAvalaible', currentData);
-            if (canRefresh) emiter.emit('refresh', currentData);
+            //*NEW_ADD
+            const itemsInstance: any[] = [];
+            //NB: chaque instance dans itemsInstance est cree une fois lors de la lecture de ce instance a index donner.
+            // et chaque responce du server cree un nouveau currentData or arrayData
 
-            Object.defineProperties(currentData, {
-              ['itemsInstance']: {
-                get: async () => {
-                  if (currentData['#itemsInstance']) {
-                    return currentData['#itemsInstance'];
-                  }
-                  const promises = currentData.items.map(
-                    (item: { _id: any }) => {
-                      return new Promise(async rev => {
-                        const instance = await createInstanceFrom({
-                          modelPath: itemModelPath,
-                          id: item._id,
-                        });
-                        rev(instance);
+            currentData.items.forEach((item: any, i: number) => {
+              let first = true;
+              let instance: any = null;
+              Object.defineProperties(itemsInstance, {
+                [i]: {
+                  get: async () => {
+                    if (first) {
+                      first = false;
+                      // console.log(itemModelPath, item._id);
+
+                      instance = await createInstanceFrom({
+                        modelPath: itemModelPath,
+                        Model,
+                        id: item._id,
                       });
-                    },
-                  );
-                  const itemsInstance: any = (
-                    await Promise.allSettled(promises)
-                  )
-                    .map((p: any) => {
-                      return p.value || null;
-                    })
-                    .filter(itemInstance => {
-                      return !!itemInstance;
-                    });
-                //   console.log(itemsInstance);
-                  return (currentData['#itemsInstance'] = itemsInstance);
-                },
-                set: async () => {
-                  console.error('ReadOnly ArrayData["itemsInstance"] ');
-                },
-              },
-            });
-            // console.log('currentData', currentData);
+                    }
+                    // console.log({ instance });
 
+                    return instance;
+                  },
+                  set: async () => {
+                    throw new Error('Read Only Property');
+                  },
+                },
+              });
+            });
+            currentData.itemsInstance = itemsInstance;
+            //console.log('currentData', currentData);
+            emiter.emit('refresh', currentData);
+            emiter.emit('dataAvalaible', currentData);
             rev(currentData);
           },
         );
@@ -506,7 +572,7 @@ export async function createArrayInstanceFrom({
       }
     });
   };
-  const data: any = await refresh();
+
   arrayInstance.back = async () => {
     // console.log('----back : ');
     if (currentData && currentData.hasPrevPage) {
@@ -559,7 +625,7 @@ export async function createArrayInstanceFrom({
   };
   arrayInstance.__itemModelPath = Promise.resolve(itemModelPath);
   arrayInstance.last = async () => {
-    if (paging.page == currentData.totalPages) {
+    if (paging.page === currentData.totalPages) {
       emiter.emit('dataAvalaible', currentData);
       return currentData;
     }

@@ -1,6 +1,8 @@
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable react-native/no-inline-styles */
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import React from 'react';
-import { Image, StyleSheet ,Text } from 'react-native';
+import { Image, Text } from 'react-native';
 import { Home } from '../../screen/Home/Home';
 import Profile from '../../screen/Profile';
 import { Infoprofile } from '../../screen/register/Infoprofile';
@@ -19,14 +21,14 @@ function DrawerNavigator() {
         drawerActiveBackgroundColor: '#fff',
         drawerActiveTintColor: '#000',
         drawerInactiveTintColor: '#000',
-        drawerItemStyle : {marginTop: 5 },
-        drawerLabelStyle: { marginLeft: -10, fontSize: 18, marginTop: 0  ,fontFamily :'Roboto-regular'},
+        drawerItemStyle: { marginTop: 5 },
+        drawerLabelStyle: { marginLeft: -10, fontSize: 18, marginTop: 0 },
       }}>
       <Drawer.Screen
         name="botommTabs"
         component={BottomTabs}
         options={{
-          drawerItemStyle: { display: 'none' }
+          drawerItemStyle: { display: 'none' },
         }}
       />
       <Drawer.Screen
@@ -34,9 +36,18 @@ function DrawerNavigator() {
         component={Profile}
         options={{
           title: 'Profile',
-          drawerItemStyle : {marginTop: 35},
-           drawerLabel: () => ( <Text style={{ fontSize: 22, color: 'black', fontFamily :'Roboto-Regular' }}>Profile</Text> ),
-          drawerIcon: ({ color, size, focused }) => (
+          drawerItemStyle: { marginTop: 35 },
+          drawerLabel: () => (
+            <Text
+              style={{
+                fontSize: 22,
+                color: 'black',
+                fontFamily: 'Kurale-Regular',
+              }}>
+              Profile
+            </Text>
+          ),
+          drawerIcon: ({ size }) => (
             <Image
               style={{
                 height: size,
@@ -53,8 +64,17 @@ function DrawerNavigator() {
         component={Home}
         options={{
           title: 'Messages',
-          drawerLabel: () => ( <Text style={{ fontSize: 22, color: 'black', fontFamily :'Roboto-Regular' }}>Messages</Text> ),
-          drawerIcon: ({ color, size, focused }) => (
+          drawerLabel: () => (
+            <Text
+              style={{
+                fontSize: 22,
+                color: 'black',
+                fontFamily: 'Kurale-Regular',
+              }}>
+              Messages
+            </Text>
+          ),
+          drawerIcon: ({ size }) => (
             <Image
               style={{
                 height: size,
@@ -71,8 +91,17 @@ function DrawerNavigator() {
         component={Infoprofile}
         options={{
           title: 'Favoris',
-          drawerLabel: () => ( <Text style={{ fontSize: 22, color: 'black', fontFamily :'Roboto-Regular' }}>Favoris</Text> ),
-          drawerIcon: ({ color, size, focused }) => (
+          drawerLabel: () => (
+            <Text
+              style={{
+                fontSize: 22,
+                color: 'black',
+                fontFamily: 'Kurale-Regular',
+              }}>
+              Favoris
+            </Text>
+          ),
+          drawerIcon: ({ size }) => (
             <Image
               style={{
                 height: size,
@@ -89,8 +118,17 @@ function DrawerNavigator() {
         component={Login}
         options={{
           title: 'Market',
-          drawerLabel: () => ( <Text style={{ fontSize: 22, color: 'black', fontFamily :'Roboto-Regular' }}>Market</Text> ),
-          drawerIcon: ({ color, size, focused }) => (
+          drawerLabel: () => (
+            <Text
+              style={{
+                fontSize: 22,
+                color: 'black',
+                fontFamily: 'Kurale-Regular',
+              }}>
+              Market
+            </Text>
+          ),
+          drawerIcon: ({ size }) => (
             <Image
               style={{
                 height: size,
@@ -104,10 +142,4 @@ function DrawerNavigator() {
     </Drawer.Navigator>
   );
 }
-const styles = StyleSheet.create({
-  avatar: {
-    height: 20,
-    width: 20,
-  },
-});
 export default DrawerNavigator;

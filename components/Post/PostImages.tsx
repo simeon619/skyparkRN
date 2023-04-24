@@ -1,58 +1,42 @@
-import React, { useEffect, useState } from 'react';
-import { Dimensions, Image, StyleSheet, View } from 'react-native';
-const { width, height } = Dimensions.get('window');
+/* eslint-disable react-native/no-inline-styles */
+import React from 'react';
+import { Dimensions, StyleSheet, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
+import { HOST } from '../../utils/metric';
+const { height } = Dimensions.get('window');
 //ts-ignore
 const PostImages = ({ images }: { images: string[] }) => {
   const renderImage = (imageUri: string, index: number, style: any) => (
-    <Image
+    <FastImage
       key={index}
-      style={[styles[style], { borderWidth: 1, borderColor: '#efefee' }]}
+      style={[
+        styles[style],
+        {
+          borderWidth: 5,
+          borderColor: '#fff',
+          borderRadius: 20,
+        },
+      ]}
       // resizeMethod={'auto'}
 
-      fadeDuration={0}
-      resizeMode={'cover'}
+      resizeMode={FastImage.resizeMode.cover}
       source={{
-        cache: 'force-cache',
+        priority: FastImage.priority.normal,
         uri: imageUri
-          ? imageUri
+          ? HOST + imageUri
           : 'https://images.pexels.com/photos/6307706/pexels-photo-6307706.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
       }}
     />
   );
-  const [imageHeights, setImageHeights] = useState<number[]>([]);
-
-  useEffect(() => {
-    const fetchImageHeights = async () => {
-      const heights = await Promise.all(
-        images.map(imageUri => getImageHeight(imageUri)),
-      );
-      setImageHeights(heights);
-    };
-    fetchImageHeights();
-  }, [images]);
-
-  const getImageHeight = async (imageUri: string) => {
-    return new Promise<number>((resolve, reject) => {
-      Image.getSize(
-        imageUri,
-        (width: number, height: number) => {
-          resolve(height);
-        },
-        (error: any) => {
-          reject(error);
-        },
-      );
-    });
-  };
 
   return (
     <>
       {images.length > 0 && (
         <View style={styles.container}>
           {images
-            .filter(image => image != '')
-            .map((image, index, images) =>
-              renderImage(image, index, `s${images.length}To${index + 1}`),
+            .filter(image => image !== '')
+            .map((image, index, imagesArr) =>
+              renderImage(image, index, `s${imagesArr.length}To${index + 1}`),
             )}
         </View>
       )}
@@ -65,6 +49,8 @@ const styles: any = StyleSheet.create({
     flexWrap: 'wrap',
     width: '100%',
     maxHeight: height / 2.2,
+    borderRadius: 99,
+    paddingBottom: 15,
   },
   //********* */
   s1To1: {

@@ -1,0 +1,29 @@
+[
+  {
+    "message": "1 comment",
+    "like": 0,
+    "comments": [
+      {
+        "message": "1.1 comment",
+        "like": 0,
+        "comments": [
+          { "message": "1.1.1 comment", "like": 0, "comments": [] },
+          { "message": "1.1.1 comment", "like": 0, "comments": [] }
+        ]
+      },
+      { "message": "1.2 comment", "like": 0, "comments": [] }
+    ]
+  },
+  {
+    "message": "2 comment",
+    "like": 0,
+    "comments": [
+      {
+        "message": "2.1 comment",
+        "like": 0,
+        "comments": [{ "message": "2.1.1 comment", "like": 0, "comments": [] }]
+      },
+      { "message": "2.2 comment", "like": 0, "comments": [] }
+    ]
+  }
+]

@@ -1,10 +1,9 @@
-import React from 'react';
-import { useEffect } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { COLORS } from '../themes/colors';
-
 export const LogoStart = ({ navigation }: any) => {
   useEffect(() => {
+    // flashLog();
     const time = setTimeout(() => {
       navigation.replace('Login');
     }, 2000);
@@ -15,14 +14,7 @@ export const LogoStart = ({ navigation }: any) => {
   });
   return (
     <View style={styles.container}>
-             <Text
-          style={{
-            fontSize: 65,
-            color: '#ffffff',
-            fontFamily: 'PermanentMarker-Regular',
-            alignSelf: 'center',
-        
-          }}>Skypark</Text>
+      <Text style={styles.logo}>Skypark</Text>
     </View>
   );
 };
@@ -34,11 +26,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.black,
   },
+  logo: {
+    fontSize: 65,
+    color: '#ffffff',
+    fontFamily: 'PermanentMarker-Regular',
+    alignSelf: 'center',
+  },
   text: {
     color: '#101010',
     fontSize: 24,
     fontWeight: 'bold',
   },
 });
-
-

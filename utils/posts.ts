@@ -3,24 +3,20 @@ import { createRandomPosts } from './RandomPost';
 type Author = {
   name: string;
   picture: string;
-  id : string
+  id: string;
 };
 
-type Comment = {
-  author: {
-    name: string;
-    id: string;
-  };
-  content: string;
-  timestamp: string;
-};
-
-type Image = {
-  url: string;
-  caption: string;
-};
+// type Comment = {
+//   author: {
+//     name: string;
+//     id: string;
+//   };
+//   content: string;
+//   timestamp: string;
+// };
 
 export type PostSchema = {
+  keyId: string;
   id: string;
   author: Author;
   type: string;
@@ -28,7 +24,6 @@ export type PostSchema = {
   images?: string[];
   videos?: string;
   likes: number;
-  comments: Comment[];
   timestamp: string;
 };
 
@@ -37,4 +32,3 @@ export type PostList = {
 };
 
 export const POST_DATA: PostSchema[] = createRandomPosts(19);
-export const POST_DATA2: PostSchema[] = createRandomPosts(19);

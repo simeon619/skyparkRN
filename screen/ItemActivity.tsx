@@ -1,6 +1,8 @@
-import { useNavigation } from '@react-navigation/native';
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { FlashList } from '@shopify/flash-list';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -10,9 +12,12 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSelector } from 'react-redux';
+import { HOST } from '../utils/metric';
 import { PropsNavigation } from '../utils/schemaType';
+import SQuery from '../utils/squery/SQueryClient';
 type ActivitySchema = {
-  id: string;
+  channelId: string;
   name: string;
   description: string;
   picture: string;
@@ -20,41 +25,56 @@ type ActivitySchema = {
 
 type ArrayActivity = ActivitySchema[];
 
-const { width, height } = Dimensions.get('window');
-const ItemActivity = (props: PropsNavigation ) => {
-  const { navigation  } = props;
-  const ItemsActivty: ArrayActivity = [
-    {
-      id: '6415453465',
-      name: 'Music',
-      description: 'Discover the new Music',
-      picture:
-        'https://images.pexels.com/photos/2228466/pexels-photo-2228466.jpeg',
-    },
-    {
-      id: '6447544465',
-      name: 'Sport',
-      description: 'Discover the new Sport',
-      picture:
-        'https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    {
-      id: '6415457865',
-      name: 'Animals',
-      description: 'Discover the Animals',
-      picture:
-        'https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    {
-      id: '641654665465',
-      name: 'Cinema',
-      description: 'Discover the new cinema',
-      picture:
-        'https://images.pexels.com/photos/7991378/pexels-photo-7991378.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-  ];
+const { height, width } = Dimensions.get('window');
+const ItemActivity = (props: PropsNavigation) => {
+  const { navigation } = props;
+  const [activities, setActivities] = useState<ArrayActivity>([]);
 
-  const ItemView = ({ item }: { item: ActivitySchema }) => {
+  useEffect(() => {
+    setActivities([]);
+    initInstance();
+  }, []);
+
+  let User = useSelector((state: any) => state.dataUser);
+  const initInstance = async () => {
+    const userId = User.userId;
+
+    let model = await SQuery.Model('user');
+
+    let user = await model.newInstance({ id: userId });
+    let Quarter = await user.extractor('./account/address/quarter');
+
+    let communityActivities = await Quarter.activities;
+    (await communityActivities.page()).items.forEach(async (item: any) => {
+      console.log({ item }, 'kofdkfodkfodkfod');
+      let activityModel = await SQuery.Model('activity');
+      console.log({ activityModel }, 'activitymodel');
+      let activity = await activityModel.newInstance({ id: item._id });
+      console.log({ activity });
+      let channel = await activity.channel;
+      let name = await activity.name;
+      let description = await activity.description;
+      console.log({ channel, activity });
+
+      let id = await channel.$id;
+      let poster = await activity.poster;
+      let picture = (await poster.imgProfile)[0];
+      console.log({ picture });
+
+      let vectors = await channel.vectors;
+      await vectors.update({ paging: { sort: { createdAt: -1 } } });
+      let Activity = {
+        channelId: id,
+        name,
+        description,
+        picture,
+      };
+      setActivities(prev => [...prev, Activity]);
+    });
+  };
+
+  const ItemView = ({ itemActivity }: { itemActivity: ActivitySchema }) => {
+    console.log(itemActivity.picture);
     return (
       <View
         style={{
@@ -67,20 +87,43 @@ const ItemActivity = (props: PropsNavigation ) => {
         }}>
         <Pressable
           onPress={() => {
-          navigation.getParent()?.navigate('Activity' , { nameActivity : item.name ,  nameUser: 'Jean'})
+            navigation.getParent()?.navigate('Activity', {
+              nameActivity: itemActivity.name,
+              nameUser: User.name,
+              channelId: itemActivity.channelId,
+            });
           }}>
           <ImageBackground
-            source={{ uri: item.picture }}
+            source={
+              itemActivity.picture
+                ? { uri: HOST + itemActivity.picture }
+                : require('../assets/images/banner.jpg')
+            }
+            // source={{
+            //   uri: 'https://images.pexels.com/photos/13733057/pexels-photo-13733057.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
+            // }}
             style={{
               width: '100%',
               height: '100%',
             }}>
             <View style={{ margin: 20 }}>
-              <Text style={{ fontSize: 25, fontWeight: '900', color: 'white' }}>
-                {item.name}
+              <Text
+                style={{
+                  fontSize: 25,
+                  fontWeight: '900',
+                  color: '#123',
+                  backgroundColor: '#fff3',
+                }}>
+                {itemActivity.name}
               </Text>
-              <Text style={{ fontSize: 15, fontWeight: '400', color: 'white' }}>
-                {item.description}
+              <Text
+                style={{
+                  fontSize: 15,
+                  fontWeight: '400',
+                  color: '#123',
+                  backgroundColor: '#fff3',
+                }}>
+                {itemActivity.description}
               </Text>
             </View>
           </ImageBackground>
@@ -92,10 +135,19 @@ const ItemActivity = (props: PropsNavigation ) => {
     <View style={{ flex: 1, paddingHorizontal: 10, paddingTop: 15 }}>
       <View style={styles.header}>
         <View style={styles.topHeader}>
-          <Image
-            style={styles.icon}
-            source={require('../assets/images/user.png')}
-          />
+          {User.imgProfile ? (
+            <Image
+              style={styles.icon}
+              resizeMode="contain"
+              source={{ uri: HOST + User.imgProfile[0] }}
+            />
+          ) : (
+            <Image
+              style={styles.icon}
+              resizeMode="contain"
+              source={require('../assets/images/user.png')}
+            />
+          )}
           <Image
             style={styles.icon1}
             source={require('../assets/images/settings.png')}
@@ -118,11 +170,11 @@ const ItemActivity = (props: PropsNavigation ) => {
         </View>
       </View>
       <FlashList
-        data={ItemsActivty}
+        data={activities}
         showsVerticalScrollIndicator={false}
         estimatedItemSize={height / 5}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => <ItemView item={item} />}
+        keyExtractor={item => item.channelId}
+        renderItem={({ item }) => <ItemView itemActivity={item} />}
       />
     </View>
   );
@@ -131,8 +183,9 @@ const ItemActivity = (props: PropsNavigation ) => {
 const styles = StyleSheet.create({
   header: {},
   icon: {
-    width: 40,
-    height: 40,
+    width: width * 0.15,
+    height: width * 0.15,
+    borderRadius: 99,
   },
   icon1: {
     width: 30,

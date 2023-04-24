@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import { FlashList } from '@shopify/flash-list';
 import React from 'react';
 import {
@@ -10,40 +11,52 @@ import {
 import { RATIO_HEADER } from '../utils/metric';
 import { PostSchema } from '../utils/posts';
 import Postcomponent from './Post/Postcomponent';
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 const Thread = ({
   POST_DATA,
   refreshing,
   setRefreshing,
   handleScrollHeader,
+  navigation,
 }: {
   POST_DATA: PostSchema[];
   refreshing: boolean;
   setRefreshing: (value: boolean) => void;
   handleScrollHeader?: (e: number) => void;
+  navigation: any;
 }) => {
   let HEADER_HEIGHT = (RATIO_HEADER * height) / 100;
+
   return (
-    // Retourner le code JSX
     <FlashList
       data={POST_DATA}
-      estimatedItemSize={height / 1.5}
-      bounces={true}
+      estimatedItemSize={height / 2.2}
+      bounces={false}
       // refreshing={refreshing}
-      contentContainerStyle={handleScrollHeader &&{
-        paddingTop: HEADER_HEIGHT,
-        paddingBottom: 20,
-      }}
+      contentContainerStyle={
+        handleScrollHeader && {
+          paddingTop: HEADER_HEIGHT,
+          backgroundColor: '#fff8',
+          paddingBottom: 20,
+        }
+      }
       showsVerticalScrollIndicator={false}
       // onRefresh={() => setRefreshing(true)}
       onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
-        if(handleScrollHeader){
+        if (handleScrollHeader) {
           handleScrollHeader(e.nativeEvent.contentOffset.y);
         }
-      
       }}
+      nestedScrollEnabled={true}
       refreshControl={
         <RefreshControl
+          style={{
+            paddingTop: HEADER_HEIGHT,
+            paddingBottom: 20,
+            position: 'absolute',
+            top: 500,
+            zIndex: 100,
+          }}
           onRefresh={() => setRefreshing(true)}
           refreshing={refreshing}
           colors={['#00ff00']} // couleur verte pour Android
@@ -55,8 +68,10 @@ const Thread = ({
       }
       scrollEventThrottle={16}
       // extraData={}
-      keyExtractor={item => item.id}
-      renderItem={({ item }) => <Postcomponent posts={item} key={item.id} />}
+      keyExtractor={item => item.keyId}
+      renderItem={({ item }) => (
+        <Postcomponent posts={item} navigation={navigation} key={item.keyId} />
+      )}
     />
   );
 };

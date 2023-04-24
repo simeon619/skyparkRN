@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useEffect, useState } from 'react';
 import {
   Animated,
   Image,
-  Pressable,
+  Modal,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -10,22 +13,27 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import ImagePicker from 'react-native-image-crop-picker';
-import { Modal, Portal } from 'react-native-paper';
+import ImagePicker, { ImageOrVideo } from 'react-native-image-crop-picker';
 // import Modal from 'react-native-modal';
+import { Pressable } from 'react-native';
 import RNFS from 'react-native-fs';
+// import { Camera, useCameraDevices } from 'react-native-vision-camera';
+import { StatusBar } from 'react-native';
 import { useSelector } from 'react-redux';
 import { COLORS } from '../../themes/colors';
 import { normalize } from '../../themes/metrics';
+import { HOST } from '../../utils/metric';
 import { PropsNavigation } from '../../utils/schemaType';
 import SQuery from '../../utils/squery/SQueryClient';
 // import { PropsNaivation } from '../../utils/schemaType';
+let model = null;
+let account = null;
+let profile: any = null;
 export const Infoprofile = (props: PropsNavigation) => {
   const { navigation } = props;
 
   const [visible, setVisible] = useState(false);
   const close = () => setVisible(false);
-  const open = () => setVisible(true);
   let User = useSelector((state: any) => state.dataUser);
   const [uri, setUri] = useState('');
   const [name, setName] = useState<string>(User?.name);
@@ -37,36 +45,53 @@ export const Infoprofile = (props: PropsNavigation) => {
   const [telephone, setTelephone] = useState(User?.telephone);
   const [city, setCity] = useState(User?.city);
   const [buildingName, setBuildingName] = useState(User?.buildingName);
-  let model = null;
-  let account = null;
-  let profile: any = null;
+
   const refresh = async () => {
     model = await SQuery.Model('account');
     account = await model.newInstance({
       id: User.accountId,
     });
-    profile = await account['profile'];
+
+    profile = await account.profile;
+    let img = await profile.imgProfile;
+
+    setUri(img[0] ? HOST + img[0] : '');
     account?.when('refresh:name', setName);
     account?.when('refresh:telephone', setTelephone);
     account?.when('refresh:email', setEmail);
     account?.when('refresh:status', setStatus);
-    profile?.when('refresh:imgProfile', setUri);
+    profile?.when('refresh:imgProfile', (imageProfile: string[]) => {
+      setUri(imageProfile[0] ? HOST + imageProfile[0] : '');
+    });
+    // setUri(User.imgProfile);
+  };
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  const [translateY] = useState(new Animated.Value(0));
+  const showModal = () => {
+    setVisible(true);
   };
 
-  refresh();
-
-  const chooseImage = () => {
+  const chooseImage = async () => {
     ImagePicker.openPicker({
       width: 300,
       height: 400,
       cropping: true,
+      mediaType: 'photo',
+      compressImageQuality: 0.5,
+      // smartAlbums: ,
     })
-      .then(async image => {
+      .then(async (image: ImageOrVideo) => {
         let buffer = await RNFS.readFile(image.path, 'base64');
-        let fileImage = { ...image, buffer, fileName: 'darwinj' };
-        console.log('profile', profile);
-
-        profile['imgProfile'] = [fileImage];
+        let fileImage = {
+          ...image,
+          buffer,
+          fileName: 'img',
+          encoding: 'base64',
+        };
+        profile.imgProfile = [fileImage];
       })
       .catch(e => {
         console.log(e);
@@ -79,9 +104,15 @@ export const Infoprofile = (props: PropsNavigation) => {
       height: 400,
       cropping: true,
     })
-      .then(image => {
-        console.log({ image });
-
+      .then(async image => {
+        let buffer = await RNFS.readFile(image.path, 'base64');
+        let fileImage = {
+          ...image,
+          buffer,
+          fileName: 'img',
+          encoding: 'base64',
+        };
+        profile.imgProfile = [fileImage];
         setUri(image.path);
       })
       .catch(e => {
@@ -90,26 +121,23 @@ export const Infoprofile = (props: PropsNavigation) => {
       .finally(close);
   };
 
-  // useEffect(() => {
-  //   setUri('http://192.168.1.2:3500' + User.imgProfile[0]);
-  // }, []);
-
-  const [translateY] = useState(new Animated.Value(0));
-  const showModal = () => {
-    setVisible(true);
-  };
-
   const hideModal = () => {
     setVisible(false);
   };
+  console.log(uri);
 
   return (
     <ScrollView
       style={{
-        backgroundColor: COLORS.backgroundLogin,
+        backgroundColor: 'white',
         flex: 1,
         alignContent: 'center',
       }}>
+      <StatusBar
+        hidden={false}
+        backgroundColor={'white'}
+        barStyle={'dark-content'}
+      />
       <View style={styles.containHeader}>
         <Text style={styles.TextHeader}>Profile</Text>
       </View>
@@ -117,6 +145,7 @@ export const Infoprofile = (props: PropsNavigation) => {
         <TouchableOpacity onPress={showModal}>
           <Image
             style={styles.avatar}
+            resizeMode="contain"
             source={uri ? { uri } : require('../../assets/images/user.png')}
           />
         </TouchableOpacity>
@@ -138,7 +167,7 @@ export const Infoprofile = (props: PropsNavigation) => {
         </View>
       </View>
 
-      <Text style={styles.txtHeader}></Text>
+      <Text style={styles.txtHeader} />
       <View style={styles.squareProfile}>
         <View style={styles.containIcon}>
           <Image
@@ -172,28 +201,28 @@ export const Infoprofile = (props: PropsNavigation) => {
       <Text
         style={styles.BtnNext}
         onPress={() => {
-          navigation.navigate('drawer');
+          navigation.navigate('Drawer');
         }}>
         NEXT
       </Text>
       <Text style={styles.Phrase}>
         Verifiez que les informations sont correctes
       </Text>
-      <Portal>
+      <View
+        onTouchEnd={hideModal}
+        style={{
+          height: 0,
+          width: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 10,
+        }}>
         <Modal
           visible={visible}
-          onDismiss={hideModal}
-          contentContainerStyle={[
-            {
-              backgroundColor: 'white',
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              borderRadius: 10,
-              transform: [{ translateY }],
-            },
-          ]}>
+          onRequestClose={hideModal}
+          transparent={true}
+          animationType="slide"
+          onDismiss={hideModal}>
           <SafeAreaView style={styles.options}>
             <Pressable style={styles.option} onPress={chooseImage}>
               <Image
@@ -211,12 +240,33 @@ export const Infoprofile = (props: PropsNavigation) => {
             </Pressable>
           </SafeAreaView>
         </Modal>
-      </Portal>
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  options: {
+    height: 80, // définir la hauteur de la vue modale
+    width: '99%', // définir la largeur de la vue modale
+    backgroundColor: '#555',
+    borderRadius: 99,
+    position: 'absolute',
+    flexDirection: 'row',
+    bottom: 0,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    // borderTopWidth: 1,
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
   avatar: {
     paddingTop: 20,
     height: 90,
@@ -228,24 +278,23 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     height: 30,
     width: 30,
+    tintColor: 'white',
   },
 
   optionSelectText: {
-    fontSize: 15,
-    color: COLORS.black,
+    fontSize: 16,
+    color: COLORS.white,
     fontWeight: '400',
+    textAlign: 'center',
+    fontFamily: 'Unbuntu-Regular',
   },
-  options: {
-    backgroundColor: COLORS.white,
-    flexDirection: 'row',
-    borderTopRightRadius: 30,
-    borderTopLeftRadius: 30,
-  },
+
   option: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 10,
+    alignContent: 'center',
+    flexDirection: 'row',
+    gap: 10,
   },
   containHeader: {
     alignItems: 'center',

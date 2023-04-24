@@ -5,7 +5,7 @@ const userDataSlice = createSlice({
   initialState: {},
   reducers: {
     addInfoUser: (state: any, action) => {
-      let newState = {  };
+      let newState = {};
       newState = action.payload;
       state = newState;
       return state;
@@ -13,28 +13,33 @@ const userDataSlice = createSlice({
   },
 });
 
-const postDataSlice = createSlice({
-  name: 'post',
-  initialState: [],
+const commentSlice = createSlice({
+  name: 'comment',
+  initialState: {},
   reducers: {
-    addPost: (state: any, action) => {
-      let newState = {  };
-      newState = action.payload;
-      state.push(newState) ;
-      return state;
+    addComment: (state: any, action) => {
+      console.log(action.payload, 'ttttttttttttttt');
+      return (state = action.payload);
     },
   },
 });
 
-
-const postDataServerSlice = createSlice({
-  name: 'post',
+const postDataBServerSlice = createSlice({
+  name: 'postB',
   initialState: [],
   reducers: {
-    addPostServer: (state: any, action) => {
-      console.log('3333@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-      state.unshift(action.payload) ;
-
+    addPostBServer: (state: any, action) => {
+      state = action.payload;
+      return state;
+    },
+  },
+});
+const postDataQServerSlice = createSlice({
+  name: 'postQ',
+  initialState: [],
+  reducers: {
+    addPostQServer: (state: any, action) => {
+      state = action.payload;
       return state;
     },
   },
@@ -58,12 +63,14 @@ const postDataServerSlice = createSlice({
 export const store = configureStore({
   reducer: {
     dataUser: userDataSlice.reducer,
-    postData : postDataSlice.reducer,
-    postDataServer : postDataServerSlice.reducer
+    commentPost: commentSlice.reducer,
+    postDataQServer: postDataQServerSlice.reducer,
+    postDataBServer: postDataBServerSlice.reducer,
   },
 });
 
 export const { addInfoUser } = userDataSlice.actions;
-export const { addPost } = postDataSlice.actions;
-export const { addPostServer } = postDataServerSlice.actions;
+export const { addComment } = commentSlice.actions;
+export const { addPostQServer } = postDataQServerSlice.actions;
+export const { addPostBServer } = postDataBServerSlice.actions;
 export type RootState = ReturnType<typeof store.getState>;

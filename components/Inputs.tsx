@@ -1,5 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-native/no-inline-styles */
+import React, { useCallback, useEffect, useState } from 'react';
 import { useController } from 'react-hook-form';
+const { width } = Dimensions.get('window');
+
 import {
   Dimensions,
   Image,
@@ -19,6 +23,7 @@ const randomImages = [
   require('../assets/images/padlock.png'),
   require('../assets/images/email.png'),
   require('../assets/images/user.png'),
+  require('../assets/images/123.png'),
 ];
 const { height: SCREEN_HEIGHT } = Dimensions.get('screen');
 export const Input = ({
@@ -89,7 +94,7 @@ export const Input = ({
         />
       </View>
       {!!errorDeatils && <Text style={styles.error}> {errorDeatils} </Text>}
-      {!!!errorDeatils && <Text style={styles.error}> {errorDeatils} </Text>}
+      {!errorDeatils && <Text style={styles.error}> {errorDeatils} </Text>}
     </>
   );
 };
@@ -98,16 +103,14 @@ export const InputPost = ({
   name,
   control,
   placeholder,
-  isVisible,
 }: {
   name: string;
   control?: any;
   placeholder: string;
-  isVisible: boolean;
 }) => {
   const {
     field,
-    fieldState: { error },
+    fieldState: {},
   } = useController({
     control,
     defaultValue: '',
@@ -125,21 +128,8 @@ export const InputPost = ({
       height: height.value,
     };
   });
-  const refinput = useRef<TextInput>(null);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
-  useEffect(() => {
-    if (isVisible) {
-      refinput.current?.focus();
-      refinput.current
-    }
-
-    return () => {
-      refinput.current?.blur();
-      Keyboard.dismiss();
-    };
-
-  }, [isVisible]);
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -182,17 +172,10 @@ export const InputPost = ({
         value={field.value}
         placeholder={placeholder}
         placeholderTextColor="grey"
-        ref={refinput}
         multiline={true}
         autoFocus={true}
-        scrollEnabled={true}
-        focusable={true}
-        onFocus={() => {
-          console.log('focus');
-        }}
-        onBlur={() => {
-          console.log('blur');
-        }}
+        // scrollEnabled={true}
+        // focusable={true}
         onContentSizeChange={handleContentSizeChange}
         onChangeText={field.onChange}
       />
@@ -200,27 +183,171 @@ export const InputPost = ({
   );
 };
 
+export const Input2 = ({
+  name,
+  control,
+  placeholder,
+  icon,
+}: {
+  name: string;
+  control: any;
+  placeholder: string;
+  icon: number;
+}) => {
+  const {
+    field,
+    fieldState: { error },
+  } = useController({
+    control,
+    defaultValue: '',
+    name,
+  });
+  const [isFocused, setIsFocused] = useState(false);
+  placeholder = isFocused ? '' : placeholder;
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
+  let errorDeatils = error?.message;
+  let typeKeyBoard:
+    | 'numeric'
+    | 'password'
+    | 'default'
+    | 'email-address'
+    | 'numbers-and-punctuation' = 'default';
+  let password = false;
+  switch (name) {
+    case 'code':
+    case 'number':
+      typeKeyBoard = 'numeric';
+      break;
+    case 'email':
+      typeKeyBoard = 'email-address';
+      break;
+    case 'Password':
+    case 'password':
+      typeKeyBoard = 'numbers-and-punctuation';
+      password = true;
+      break;
+    case 'confirmPassword':
+      typeKeyBoard = 'numbers-and-punctuation';
+      password = true;
+      name = 'confirm Password';
+      break;
+
+    default:
+      typeKeyBoard = 'default';
+      break;
+  }
+
+  return (
+    <>
+      <View
+        style={[
+          styles.SectionStyle2,
+          !!errorDeatils && {
+            borderBottomColor: COLORS.error,
+            borderBottomWidth: 1,
+            // backgroundColor: COLORS.error,
+          },
+          isFocused && {
+            borderRadius: 4,
+            elevation: 2,
+            borderBottomWidth: 0.3,
+            backgroundColor: 'white',
+          },
+        ]}>
+        <Image source={randomImages[icon]} style={styles.ImageStyle} />
+        <View style={{ alignItems: 'flex-start' }}>
+          {isFocused && (
+            <Text
+              style={{
+                fontSize: 12,
+                color: '#4448',
+                fontFamily: 'Roboto-Bold',
+              }}>
+              {name.toLocaleUpperCase()}
+            </Text>
+          )}
+          <View style={{ flex: 1, flexDirection: 'row', width: width * 0.65 }}>
+            <TextInput
+              style={{
+                flex: 1,
+                color: '#112',
+                paddingVertical: 2,
+                fontFamily: 'Roboto-Bold',
+                fontSize: 15,
+                // width: width * 0.7,
+                // overflow: 'hidden',
+                // backgroundColor: '#ff2',
+              }}
+              value={field.value}
+              onChangeText={field.onChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              placeholderTextColor={'#4448'}
+              placeholder={placeholder}
+              secureTextEntry={password}
+              keyboardType={typeKeyBoard}
+            />
+            {name === 'password' && (
+              <Text
+                style={[
+                  {
+                    fontSize: 13,
+                    color: COLORS.blue,
+                    fontFamily: 'Roboto-Bold',
+                    height: 20,
+                    // backgroundColor: 'white',
+                    paddingRight: 5,
+                  },
+                  !isFocused && { top: 16 },
+                ]}>
+                FORGOT
+              </Text>
+            )}
+          </View>
+        </View>
+      </View>
+      {!!errorDeatils && <Text style={styles.error}> {errorDeatils} </Text>}
+      {!errorDeatils && <Text style={styles.error}> {errorDeatils} </Text>}
+    </>
+  );
+};
+
 const styles = StyleSheet.create({
+  SectionStyle2: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    // paddingHorizontal: 20,
+
+    backgroundColor: '#fffc',
+    borderBottomColor: 'grey',
+    borderBottomWidth: 0.4,
+    // height: 50,
+
+    marginHorizontal: 19,
+    color: COLORS.blue,
+    marginTop: 10,
+    paddingTop: 5,
+  },
+  ImageStyle: {
+    margin: 10,
+    width: 25,
+    aspectRatio: 1,
+    tintColor: '#333',
+    resizeMode: 'stretch',
+    alignSelf: 'flex-end',
+  },
   SectionStyle: {
     flexDirection: 'row',
     justifyContent: 'center',
     backgroundColor: COLORS.backgroundInput,
-    height: 50,
+    height: 60,
     borderRadius: 99,
     marginHorizontal: 19,
     elevation: 10,
     color: COLORS.blue,
     marginTop: 10,
   },
-  ImageStyle: {
-    margin: 15,
-    height: 20,
-    tintColor: COLORS.blue,
-    width: 20,
-    resizeMode: 'stretch',
-    alignItems: 'center',
-  },
-
   error: {
     fontSize: 11,
     color: COLORS.error,
