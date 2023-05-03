@@ -18,29 +18,27 @@ const commentSlice = createSlice({
   initialState: {},
   reducers: {
     addComment: (state: any, action) => {
-      console.log(action.payload, 'ttttttttttttttt');
       return (state = action.payload);
     },
   },
 });
 
-const postDataBServerSlice = createSlice({
-  name: 'postB',
+const contactSlice = createSlice({
+  name: 'contact',
   initialState: [],
   reducers: {
-    addPostBServer: (state: any, action) => {
+    addConatct: (state: any, action) => {
       state = action.payload;
       return state;
     },
   },
 });
-const postDataQServerSlice = createSlice({
-  name: 'postQ',
-  initialState: [],
+const postQuarterSlice = createSlice({
+  name: 'postQuarter',
+  initialState: {},
   reducers: {
-    addPostQServer: (state: any, action) => {
-      state = action.payload;
-      return state;
+    addPostQuarter: (state: any, action) => {
+      return (state = action.payload);
     },
   },
 });
@@ -64,13 +62,13 @@ export const store = configureStore({
   reducer: {
     dataUser: userDataSlice.reducer,
     commentPost: commentSlice.reducer,
-    postDataQServer: postDataQServerSlice.reducer,
-    postDataBServer: postDataBServerSlice.reducer,
+    postQuarter: postQuarterSlice.reducer,
+    contact: contactSlice.reducer,
   },
 });
 
 export const { addInfoUser } = userDataSlice.actions;
 export const { addComment } = commentSlice.actions;
-export const { addPostQServer } = postDataQServerSlice.actions;
-export const { addPostBServer } = postDataBServerSlice.actions;
+export const { addPostQuarter } = postQuarterSlice.actions;
+export const { addConatct } = contactSlice.actions;
 export type RootState = ReturnType<typeof store.getState>;

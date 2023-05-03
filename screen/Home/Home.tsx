@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
@@ -16,7 +17,7 @@ import { useSelector } from 'react-redux';
 import Thread from '../../components/Thread';
 import { Header } from '../../components/header';
 import { COLORS } from '../../themes/colors';
-import { HOST, RATIO_HEADER } from '../../utils/metric';
+import { RATIO_HEADER, initPostActivity } from '../../utils/metric';
 import { PostSchema } from '../../utils/posts';
 import SQuery from '../../utils/squery/SQueryClient';
 const { height: SCREEN_HEIGHT, width } = Dimensions.get('window');
@@ -41,23 +42,8 @@ export const Home = ({ navigation }: any) => {
     extrapolate: 'clamp',
     // easing: Easing.bounce
   });
-  // const upDown = diffClamp.interpolate({
-  //   inputRange: [
-  //     0,
-  //     HEADER_HEIGHT / 10,
-  //     HEADER_HEIGHT / 7,
-  //     HEADER_HEIGHT / 5,
-  //     HEADER_HEIGHT / 4,
-  //     HEADER_HEIGHT / 3,
-  //     HEADER_HEIGHT / 2,
-  //   ],
-  //   outputRange: [1, 1, 1, 1, 1, 1, 0],
-  //   extrapolate: 'clamp',
-  //   // easing: Easing.bounce
-  // });
   const handleScrollHeader = (e: number) => {
     scrollY.setValue(e);
-    // navigation.setOptions({ tabBarStyle: { display: 'none' } });
   };
 
   const swiperRef = useRef<PagerView>(null);
@@ -85,7 +71,7 @@ export const Home = ({ navigation }: any) => {
       setVectorQ,
       setPostQuarter,
     );
-
+    // initActivity();
     initializePost(
       './account/address/building/Thread',
       setVectorB,
@@ -94,7 +80,14 @@ export const Home = ({ navigation }: any) => {
   }, []);
 
   const User = useSelector((state: any) => state.dataUser);
-
+  const ListPostQuarter: any = useSelector((state: any) => state.postQuarter);
+  let arr: any[] = [];
+  for (let key in ListPostQuarter) {
+    arr = arr.concat(ListPostQuarter[key].results);
+  }
+  // setPostQuarter(arr);
+  // let data = ListPostQuarter[route.params.activityId];
+  // let Post: PostSchema[] = data?.results;
   const initializePost = async (
     path: string,
     setVector: any,
@@ -153,9 +146,8 @@ export const Home = ({ navigation }: any) => {
         author: {
           id: accountId,
           name,
-          picture: imgProfile ? HOST + imgProfile : '',
+          picture: imgProfile ? imgProfile : '',
         },
-        type: 'image',
         content: text,
         images: urlArray,
         likes: like,
@@ -167,8 +159,10 @@ export const Home = ({ navigation }: any) => {
     const data = await vectors.update();
 
     let storePost: PostSchema[] = (await getNewData(data))
+
       .filter(p => !!p.value)
       .map(p => p.value);
+    console.log(storePost);
     setPosts((prev: any) => [...prev, ...storePost]);
   };
   async function getNewData(data: any): Promise<any[]> {
@@ -216,9 +210,8 @@ export const Home = ({ navigation }: any) => {
           author: {
             id: accountId,
             name,
-            picture: imgProfile ? HOST + imgProfile : '',
+            picture: imgProfile ? imgProfile : '',
           },
-          type: 'image',
           content: text,
           images: urlArray,
           likes: like,
@@ -228,6 +221,24 @@ export const Home = ({ navigation }: any) => {
         return postGet;
       }),
     );
+  }
+
+  async function initActivity() {
+    const userId = User.userId;
+    let model = await SQuery.Model('user');
+    let user = await model.newInstance({ id: userId });
+    let Quarter = await user.extractor('./account/address/quarter');
+    let communityActivities = await Quarter.activities;
+    (await communityActivities.page()).items.forEach(async (item: any) => {
+      let activityModel = await SQuery.Model('activity');
+      let activity = await activityModel.newInstance({ id: item._id });
+      // console.log({ activity });
+      let channel = await activity.channel;
+      let name = await activity.name;
+      let icon = (await activity.icon)[0];
+      let vectors = await channel.vectors;
+      initPostActivity(name, icon, vectors, item._id);
+    });
   }
   return (
     <>
@@ -287,7 +298,7 @@ export const Home = ({ navigation }: any) => {
         <PagerView
           style={styles.wrapper}
           initialPage={0}
-          pageMargin={190}
+          pageMargin={10}
           ref={swiperRef}
           onPageSelected={e => {
             setPage(e.nativeEvent.position);
@@ -304,7 +315,7 @@ export const Home = ({ navigation }: any) => {
           {/* Neighborhood */}
           <Thread
             key={1}
-            POST_DATA={postQuarter}
+            POST_DATA={[...postQuarter, ...arr]}
             navigation={navigation}
             handleScrollHeader={handleScrollHeader}
             refreshing={refreshing}
@@ -319,6 +330,7 @@ export const Home = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   main: {
     flex: 1,
+    marginTop: StatusBar.currentHeight,
     // backgroundColor: COLORS.white,
   },
   textAreaContainer: {

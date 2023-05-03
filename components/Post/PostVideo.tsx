@@ -1,26 +1,23 @@
-import React, { useRef, useState } from 'react';
-import {
-  Dimensions,
-  GestureResponderEvent,
-  Image,
-  StyleSheet,
-  View,
-} from 'react-native';
+/* eslint-disable react-native/no-inline-styles */
+import React, { useState } from 'react';
+import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
 import * as Progress from 'react-native-progress';
 import pause from '../../assets/images/pause.png';
 import play from '../../assets/images/play.png';
-const { width, height } = Dimensions.get('window');
+
 //ts-ignore
 import Video, { OnLoadData, OnProgressData } from 'react-native-video';
+import { HOST } from '../../utils/metric';
 const PostVideo = ({ video }: { video: string }) => {
+  const { width, height } = useWindowDimensions();
   console.log('video', video);
   let [paused, setPause] = useState(true);
-  const handleFocus = (e: GestureResponderEvent) => {
+  const handleFocus = () => {
     setPause(!paused);
   };
 
   const [heightVideo, setHeightVideo] = useState(0);
-  const [widthVideo, setWidthVideo] = useState(0);
+  const [_widthVideo, setWidthVideo] = useState(0);
   const [lengthVideo, setLengthVideo] = useState(0);
   const handleLoad = (data: OnLoadData) => {
     setWidthVideo(data.naturalSize.width);
@@ -35,14 +32,17 @@ const PostVideo = ({ video }: { video: string }) => {
   return (
     <View
       style={{
-        width,
-        height: heightVideo,
-        maxHeight: height / 2,
+        // marginTop: 5,
+        width: width - 26,
+        height: width - 20,
+        borderRadius: 5,
+        overflow: 'hidden',
+        // maxHeight: height / 2,
       }}>
       <Video
         onTouchEnd={handleFocus}
         source={{
-          uri: 'https://joy.videvo.net/videvo_files/video/premium/video0236/small_watermarked/NO%20MR_STOCK%20FOOTAGE%20NO%20MR%20(985)_preview.webm',
+          uri: HOST + video,
         }}
         onLoad={handleLoad}
         style={{
@@ -61,13 +61,44 @@ const PostVideo = ({ video }: { video: string }) => {
         paused={paused}
         resizeMode="cover"
       />
-      <View>
-        {paused ? (
-          <Image source={play} style={{ width: 15, height: 15 }} />
-        ) : (
-          <Image source={pause} style={{ width: 15, height: 15 }} />
-        )}
-      </View>
+      {paused && (
+        <View
+          style={{
+            width: 50,
+            height: 50,
+            backgroundColor: '#0005',
+            padding: 10,
+            borderRadius: 99,
+            position: 'absolute',
+            margin: 'auto',
+            right: (width - 20) / 2 - 25,
+            top: (width - 20) / 2 - 25,
+          }}>
+          {paused ? (
+            <Image
+              source={play}
+              resizeMode="contain"
+              style={{
+                // backgroundColor: '#0005',
+                width: '100%',
+                height: '100%',
+                // alignItems: 'center',
+                // justifyContent: 'center',
+                // transform: [{ translateX: 25, translateY: 25 }],
+              }}
+            />
+          ) : (
+            <Image
+              source={pause}
+              resizeMode="cover"
+              style={{
+                width: 0,
+                height: 0,
+              }}
+            />
+          )}
+        </View>
+      )}
       <View
         style={{
           position: 'absolute',
@@ -80,7 +111,7 @@ const PostVideo = ({ video }: { video: string }) => {
           width={width}
           animated={true}
           useNativeDriver={true}
-          height={3}
+          height={6}
           color="purple"
           borderColor="#0000"
         />
@@ -89,7 +120,7 @@ const PostVideo = ({ video }: { video: string }) => {
   );
 };
 
-const styles: any = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {},
   //********* */
   s1To1: {

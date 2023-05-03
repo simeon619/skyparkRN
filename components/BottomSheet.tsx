@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-inline-styles */
+
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useImperativeHandle } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
@@ -17,6 +19,7 @@ const MAX_TRANSLATE_Y = -SCREEN_HEIGHT + 50;
 
 type BottomSheetProps = {
   children?: React.ReactNode;
+  colors: string;
 };
 
 export type BottomSheetRefProps = {
@@ -25,7 +28,7 @@ export type BottomSheetRefProps = {
 };
 
 const BottomSheet = React.forwardRef<BottomSheetRefProps, BottomSheetProps>(
-  ({ children }, ref) => {
+  ({ children, colors }, ref) => {
     const translateY = useSharedValue(0);
     const active = useSharedValue(false);
 
@@ -78,7 +81,18 @@ const BottomSheet = React.forwardRef<BottomSheetRefProps, BottomSheetProps>(
 
     return (
       <GestureDetector gesture={gesture}>
-        <Animated.View style={[styles.bottomSheetContainer, rBottomSheetStyle]}>
+        <Animated.View
+          style={[
+            {
+              height: SCREEN_HEIGHT,
+              width: '101%',
+              backgroundColor: colors,
+              position: 'absolute',
+              top: SCREEN_HEIGHT,
+              borderRadius: 25,
+            },
+            rBottomSheetStyle,
+          ]}>
           <View style={styles.line} />
           {children}
         </Animated.View>
@@ -88,14 +102,14 @@ const BottomSheet = React.forwardRef<BottomSheetRefProps, BottomSheetProps>(
 );
 
 const styles = StyleSheet.create({
-  bottomSheetContainer: {
-    height: SCREEN_HEIGHT,
-    width: '101%',
-    backgroundColor: '#444',
-    position: 'absolute',
-    top: SCREEN_HEIGHT,
-    borderRadius: 25,
-  },
+  // bottomSheetContainer: {
+  //   height: SCREEN_HEIGHT,
+  //   width: '101%',
+  //   backgroundColor: colors,
+  //   position: 'absolute',
+  //   top: SCREEN_HEIGHT,
+  //   borderRadius: 25,
+  // },
   line: {
     width: 75,
     height: 4,

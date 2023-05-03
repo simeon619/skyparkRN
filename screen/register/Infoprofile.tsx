@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Animated,
+  Dimensions,
   Image,
   Modal,
   SafeAreaView,
@@ -19,13 +20,14 @@ import { Pressable } from 'react-native';
 import RNFS from 'react-native-fs';
 // import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import { StatusBar } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { useSelector } from 'react-redux';
 import { COLORS } from '../../themes/colors';
-import { normalize } from '../../themes/metrics';
 import { HOST } from '../../utils/metric';
 import { PropsNavigation } from '../../utils/schemaType';
 import SQuery from '../../utils/squery/SQueryClient';
 // import { PropsNaivation } from '../../utils/schemaType';
+const { height, width } = Dimensions.get('window');
 let model = null;
 let account = null;
 let profile: any = null;
@@ -129,118 +131,132 @@ export const Infoprofile = (props: PropsNavigation) => {
   return (
     <ScrollView
       style={{
-        backgroundColor: 'white',
+        backgroundColor: '#ccc0',
         flex: 1,
         alignContent: 'center',
+        marginTop: StatusBar.currentHeight,
       }}>
-      <StatusBar
-        hidden={false}
-        backgroundColor={'white'}
-        barStyle={'dark-content'}
-      />
-      <View style={styles.containHeader}>
-        <Text style={styles.TextHeader}>Profile</Text>
-      </View>
-      <View style={styles.containProfile}>
-        <TouchableOpacity onPress={showModal}>
-          <Image
-            style={styles.avatar}
-            resizeMode="contain"
-            source={uri ? { uri } : require('../../assets/images/user.png')}
-          />
-        </TouchableOpacity>
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.status}>Locataire</Text>
-      </View>
-      <View style={styles.AddressContain}>
-        <View style={styles.room}>
-          <Text style={styles.valueAdress}>{room}</Text>
-          <Text style={styles.titleAdress}>Flat</Text>
-        </View>
-        <View style={styles.door}>
-          <Text style={styles.valueAdress}>{door}</Text>
-          <Text style={styles.titleAdress}>Entrance</Text>
-        </View>
-        <View style={styles.stair}>
-          <Text style={styles.valueAdress}>{etage}</Text>
-          <Text style={styles.titleAdress}>Floor</Text>
-        </View>
-      </View>
+      <LinearGradient
+        style={{ height }}
+        colors={['#a9f9', '#eee']}
+        useAngle={true}
+        angle={360 * 0.5}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}>
+        <StatusBar
+          hidden={false}
+          backgroundColor={'#a9f9'}
+          barStyle={'dark-content'}
+        />
 
-      <Text style={styles.txtHeader} />
-      <View style={styles.squareProfile}>
-        <View style={styles.containIcon}>
-          <Image
-            style={styles.icon1}
-            source={require('../../assets/images/email.png')}
-          />
-          <Text style={styles.icontxt}>{email}</Text>
+        <View style={styles.containProfile}>
+          <TouchableOpacity onPress={showModal}>
+            <Image
+              style={styles.avatar}
+              resizeMode="contain"
+              source={uri ? { uri } : require('../../assets/images/user.png')}
+            />
+          </TouchableOpacity>
+          <Text style={styles.name}>{name}</Text>
+          <View style={{ borderRadius: 5, overflow: 'hidden' }}>
+            <LinearGradient
+              colors={['#9922ff', '#9922ff84']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}>
+              <Text style={styles.status}>Locataire</Text>
+            </LinearGradient>
+          </View>
         </View>
-        <View style={styles.containIcon}>
-          <Image
-            style={styles.icon1}
-            source={require('../../assets/images/telephone.png')}
-          />
-          <Text style={styles.icontxt}>{telephone}</Text>
+        <View style={styles.AddressContain}>
+          <View style={styles.room}>
+            <Text style={styles.valueAdress}>{room}</Text>
+            <Text style={styles.titleAdress}>Flat</Text>
+          </View>
+          <View style={styles.door}>
+            <Text style={styles.valueAdress}>{door}</Text>
+            <Text style={styles.titleAdress}>Entrance</Text>
+          </View>
+          <View style={styles.stair}>
+            <Text style={styles.valueAdress}>{etage}</Text>
+            <Text style={styles.titleAdress}>Floor</Text>
+          </View>
         </View>
-        <View style={styles.containIcon}>
-          <Image
-            style={styles.icon1}
-            source={require('../../assets/images/home-address.png')}
-          />
-          <Text style={styles.icontxt}>{city}</Text>
+
+        <View style={styles.txtHeader} />
+        <View style={styles.squareProfile}>
+          <View style={styles.containIcon}>
+            <Image
+              style={styles.icon1}
+              source={require('../../assets/images/email.png')}
+            />
+            <Text style={styles.icontxt}>{email}</Text>
+          </View>
+          <View style={styles.containIcon}>
+            <Image
+              style={styles.icon1}
+              source={require('../../assets/images/telephone.png')}
+            />
+            <Text style={styles.icontxt}>{telephone}</Text>
+          </View>
+          <View style={styles.containIcon}>
+            <Image
+              style={styles.icon1}
+              source={require('../../assets/images/home-address.png')}
+            />
+            <Text style={styles.icontxt}>{city}</Text>
+          </View>
+          <View style={styles.containIcon}>
+            <Image
+              style={styles.icon1}
+              source={require('../../assets/images/building.png')}
+            />
+            <Text style={styles.icontxt}>{buildingName}</Text>
+          </View>
         </View>
-        <View style={styles.containIcon}>
-          <Image
-            style={styles.icon1}
-            source={require('../../assets/images/building.png')}
-          />
-          <Text style={styles.icontxt}>{buildingName}</Text>
+        <Text
+          style={styles.BtnNext}
+          onPress={() => {
+            navigation.navigate('Drawer');
+          }}>
+          NEXT
+        </Text>
+        <Text style={styles.Phrase}>
+          Verifiez que les informations sont correctes
+        </Text>
+        <View
+          onTouchEnd={hideModal}
+          style={{
+            height: 0,
+            width: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 10,
+          }}>
+          <Modal
+            visible={visible}
+            onRequestClose={hideModal}
+            transparent={true}
+            animationType="slide"
+            onDismiss={hideModal}>
+            <SafeAreaView style={styles.options}>
+              <Pressable style={styles.option} onPress={chooseImage}>
+                <Image
+                  source={require('../../assets/images/image.png')}
+                  style={styles.optionSelect}
+                />
+                <Text style={styles.optionSelectText}>Library </Text>
+              </Pressable>
+              <Pressable style={styles.option} onPress={openCamera}>
+                <Image
+                  source={require('../../assets/images/diaphragm.png')}
+                  style={styles.optionSelect}
+                />
+                <Text style={styles.optionSelectText}>Camera</Text>
+              </Pressable>
+            </SafeAreaView>
+          </Modal>
         </View>
-      </View>
-      <Text
-        style={styles.BtnNext}
-        onPress={() => {
-          navigation.navigate('Drawer');
-        }}>
-        NEXT
-      </Text>
-      <Text style={styles.Phrase}>
-        Verifiez que les informations sont correctes
-      </Text>
-      <View
-        onTouchEnd={hideModal}
-        style={{
-          height: 0,
-          width: 0,
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: 10,
-        }}>
-        <Modal
-          visible={visible}
-          onRequestClose={hideModal}
-          transparent={true}
-          animationType="slide"
-          onDismiss={hideModal}>
-          <SafeAreaView style={styles.options}>
-            <Pressable style={styles.option} onPress={chooseImage}>
-              <Image
-                source={require('../../assets/images/image.png')}
-                style={styles.optionSelect}
-              />
-              <Text style={styles.optionSelectText}>Library </Text>
-            </Pressable>
-            <Pressable style={styles.option} onPress={openCamera}>
-              <Image
-                source={require('../../assets/images/diaphragm.png')}
-                style={styles.optionSelect}
-              />
-              <Text style={styles.optionSelectText}>Camera</Text>
-            </Pressable>
-          </SafeAreaView>
-        </Modal>
-      </View>
+      </LinearGradient>
     </ScrollView>
   );
 };
@@ -269,8 +285,8 @@ const styles = StyleSheet.create({
   },
   avatar: {
     paddingTop: 20,
-    height: 90,
-    width: 90,
+    height: width * 0.45,
+    width: width * 0.45,
     borderRadius: 100,
     padding: 20,
   },
@@ -309,19 +325,24 @@ const styles = StyleSheet.create({
   },
   containProfile: {
     alignItems: 'center',
+    paddingTop: 20,
   },
   name: {
-    color: COLORS.black,
-    fontSize: 25,
-    letterSpacing: 2,
-    marginTop: 10,
-    fontWeight: '700',
+    color: '#333',
+    fontSize: width * 0.08,
+    letterSpacing: 3,
+    fontWeight: '500',
   },
   status: {
-    color: COLORS.black,
+    color: '#fff',
     fontSize: 20,
+    fontFamily: 'Roboto-Regular',
     fontWeight: '400',
     letterSpacing: 1.5,
+    // backgroundColor: '#45e',
+    paddingVertical: 5,
+    borderRadius: 15,
+    paddingHorizontal: 10,
   },
   AddressContain: {
     marginTop: 15,
@@ -330,13 +351,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   titleAdress: {
-    color: COLORS.black,
-    fontSize: 20,
-    fontWeight: '300',
+    color: '#666',
+    fontSize: 15,
+    fontWeight: '400',
     letterSpacing: 2,
   },
   valueAdress: {
-    color: COLORS.black,
+    color: '#444',
     fontSize: 24,
     fontWeight: '700',
     textAlign: 'center',
@@ -347,7 +368,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexWrap: 'wrap',
     gap: 10,
-    marginBottom: 10,
+    marginTop: 10,
     padding: 5,
     elevation: 1,
   },
@@ -359,33 +380,34 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.purple,
   },
   icontxt: {
-    color: COLORS.black,
-    fontSize: normalize(15),
+    color: '#333',
+    fontSize: 15,
     letterSpacing: 1,
-    fontWeight: '700',
+    marginLeft: 'auto',
+    fontFamily: 'Roboto-Regular',
   },
   txtHeader: {
-    color: COLORS.black,
-    backgroundColor: COLORS.backgroundInput,
-    fontSize: 5,
-    textAlign: 'center',
-    marginBottom: 25,
-    textTransform: 'uppercase',
+    width,
+    height: 1,
+    backgroundColor: '#1113',
   },
   icon1: {
     height: 15,
     width: 15,
     padding: 13,
+    tintColor: COLORS.purple,
   },
   containIcon: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    minWidth: width * 0.6,
+    // justifyContent: 'center',
     paddingHorizontal: 3,
     paddingBottom: 2,
-    gap: 1,
+    // gap: 10,
     borderBottomColor: COLORS.purple,
     borderBottomWidth: 5,
+    // marginHorizontal: 40,
   },
   BtnNext: {
     color: COLORS.white,

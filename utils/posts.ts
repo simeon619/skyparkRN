@@ -19,7 +19,8 @@ export type PostSchema = {
   keyId: string;
   id: string;
   author: Author;
-  type: string;
+  nameActivity?: string;
+  iconActivity?: string;
   content: string;
   images?: string[];
   videos?: string;

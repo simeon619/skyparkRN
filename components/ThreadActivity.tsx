@@ -1,10 +1,9 @@
-import { FlashList } from '@shopify/flash-list';
 import React from 'react';
-import { Dimensions } from 'react-native';
+import { FlatList } from 'react-native';
 
 import { PostSchema } from '../utils/posts';
 import Postcomponent from './Post/Postcomponent';
-const { height } = Dimensions.get('window');
+// const { height } = Dimensions.get('window');
 const ThreadActivity = ({
   POST_DATA,
   navigation,
@@ -12,10 +11,12 @@ const ThreadActivity = ({
   POST_DATA: PostSchema[];
   navigation: any;
 }) => {
+  console.log(POST_DATA, 'POST_DATA');
+
   return (
-    <FlashList
+    <FlatList
       data={POST_DATA}
-      estimatedItemSize={height / 2.2}
+      // estimatedItemSize={height / 2.2}
       bounces={false}
       showsVerticalScrollIndicator={false}
       nestedScrollEnabled={true}

@@ -2,73 +2,68 @@
 import React from 'react';
 import {
   Dimensions,
-  Image,
+  ImageBackground,
   StatusBar,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { KeyboardInsetsView } from 'react-native-keyboard-insets';
 import FormLogin from '../../layouts/Formlogin';
 import { COLORS } from '../../themes/colors';
 const { width, height } = Dimensions.get('window');
 export const Login = ({ navigation }: any) => {
   return (
-    <View style={styles.container}>
-      <StatusBar hidden />
-      <View style={{ flex: 4 }}>
-        <Image
-          resizeMode="cover"
-          style={{ width, height }}
-          source={require('../../assets/images/banner.jpg')}
-        />
-      </View>
-      <View
-        style={{
-          height: height * 0.2,
-          alignSelf: 'flex-start',
-          marginHorizontal: 20,
-          rowGap: 5,
-          justifyContent: 'center',
-          paddingHorizontal: 10,
-        }}>
-        <Text
-          style={{ fontFamily: 'Ubuntu-Bold', fontSize: 40, color: '#eee' }}>
-          Login
-        </Text>
-        <Text
-          style={{ fontFamily: 'Ubuntu-Bold', fontSize: 20, color: '#ccc' }}>
-          Please sign in to continue.
-        </Text>
-      </View>
-      <View style={styles.containerForm}>
-        <FormLogin navigation={navigation} />
-        <View style={styles.gotoregister}>
-          <Text style={styles.simple}>Don't have an account ?</Text>
+    <KeyboardInsetsView extraHeight={5}>
+      <StatusBar backgroundColor={'#000'} barStyle={'light-content'} />
+      <ImageBackground
+        resizeMode="cover"
+        style={{ width, height }}
+        source={require('../../assets/images/banner.jpg')}>
+        <View
+          style={{
+            height: height * 0.4,
+            alignSelf: 'flex-start',
+            marginHorizontal: 20,
+            rowGap: 5,
+            justifyContent: 'center',
+            paddingHorizontal: 10,
+          }}>
           <Text
-            style={styles.link}
-            onPress={() => {
-              navigation.navigate('Signup');
-            }}>
-            Sign up
+            style={{ fontFamily: 'Ubuntu-Bold', fontSize: 40, color: '#eee' }}>
+            Login
+          </Text>
+          <Text
+            style={{ fontFamily: 'Ubuntu-Bold', fontSize: 20, color: '#ccc' }}>
+            Please sign in to continue.
           </Text>
         </View>
-      </View>
-    </View>
+        <View style={styles.containerForm}>
+          <FormLogin navigation={navigation} />
+          <View style={styles.gotoregister}>
+            <Text style={styles.simple}>Don't have an account ?</Text>
+            <Text
+              style={styles.link}
+              onPress={() => {
+                navigation.navigate('Signup');
+              }}>
+              Sign up
+            </Text>
+          </View>
+        </View>
+      </ImageBackground>
+    </KeyboardInsetsView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: COLORS.backgroundLogin,
-  },
   containerForm: {
     width: '95%',
     height: height * 0.6,
     backgroundColor: '#0008',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    alignSelf: 'center',
     // backgroundColor: COLORS.backgroundLogin,
   },
   textwelcome: {

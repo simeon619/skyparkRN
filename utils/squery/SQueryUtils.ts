@@ -473,7 +473,7 @@ export async function createArrayInstanceFrom({
     async (data: any) => {
       const modifData = {
         added: data.added,
-        remove: data.remove,
+        removed: data.removed,
       };
       Object.defineProperties(modifData, {
         arrayData: {

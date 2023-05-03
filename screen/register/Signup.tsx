@@ -3,77 +3,75 @@ import React from 'react';
 import {
   Dimensions,
   Image,
+  ImageBackground,
   StatusBar,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { KeyboardInsetsView } from 'react-native-keyboard-insets';
 import { FormSignup } from '../../layouts/FormSignup';
 import { COLORS } from '../../themes/colors';
 const { width, height } = Dimensions.get('window');
 
 export const Signup = ({ navigation }: any) => {
   return (
-    <View style={styles.containerFormPerso}>
-      <StatusBar backgroundColor={'#fff'} barStyle={'dark-content'} />
-      <View style={{ flex: 2 }}>
-        <Image
-          resizeMode="cover"
-          style={{ width, height }}
-          source={require('../../assets/images/banner.jpg')}
-        />
-      </View>
-      <View
-        style={{
-          height: height * 0.1,
-          //alignSelf: 'flex-start',
-          marginHorizontal: 20,
-          justifyContent: 'center',
-          paddingHorizontal: 10,
-        }}>
-        <Image
+    <KeyboardInsetsView extraHeight={5}>
+      <StatusBar backgroundColor={'#000'} barStyle={'light-content'} />
+      <ImageBackground
+        resizeMode="cover"
+        style={{ width, height, justifyContent: 'space-between' }}
+        source={require('../../assets/images/banner.jpg')}>
+        <View
           style={{
-            width: 40,
-            height: 40,
-            position: 'absolute',
-            tintColor: COLORS.blue,
-            top: -40,
-          }}
-          source={require('../../assets/images/arrowback.png')}
-        />
-        <Text
-          style={{
-            fontFamily: 'Ubuntu-Bold',
-            fontSize: width * 0.11,
-            color: '#ccc',
+            height: height * 0.2,
+            //alignSelf: 'flex-start',
+            marginHorizontal: 20,
+            justifyContent: 'center',
+            paddingHorizontal: 10,
+            marginTop: 40,
           }}>
-          Create Account
-        </Text>
-      </View>
-      <View style={styles.containerForm}>
-        <FormSignup navigation={navigation} />
-        <View style={styles.gotoregister}>
-          <Text style={styles.simple}>Already have a account ?</Text>
+          <Image
+            style={{
+              width: 20,
+              height: 20,
+              padding: 20,
+              backgroundColor: '#000a',
+              borderRadius: 99,
+              position: 'absolute',
+              tintColor: 'white',
+              top: 0,
+            }}
+            source={require('../../assets/images/arrowback.png')}
+          />
           <Text
-            style={styles.link}
-            onPress={() => {
-              navigation.navigate('Login');
+            style={{
+              fontFamily: 'Ubuntu-Bold',
+              fontSize: width * 0.11,
+              color: '#ccc',
             }}>
-            Login
+            Create Account
           </Text>
         </View>
-      </View>
-    </View>
+        <View style={styles.containerForm}>
+          <FormSignup navigation={navigation} />
+          <View style={styles.gotoregister}>
+            <Text style={styles.simple}>Already have a account ?</Text>
+            <Text
+              style={styles.link}
+              onPress={() => {
+                navigation.navigate('Login');
+              }}>
+              Login
+            </Text>
+          </View>
+        </View>
+      </ImageBackground>
+    </KeyboardInsetsView>
   );
 };
 
 const styles = StyleSheet.create({
-  containerFormPerso: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: COLORS.backgroundLogin,
-    justifyContent: 'center',
-  },
   simple: {
     fontFamily: 'Kurale-Regular',
     fontSize: 18,
@@ -103,11 +101,12 @@ const styles = StyleSheet.create({
   },
   containerForm: {
     width: '95%',
-    height: height * 0.75,
+    height: height * 0.7,
     // borderRadius: 20,
-    // justifyContent: 'center',
+    alignSelf: 'center',
     backgroundColor: '#0008',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    // flex: 1,
   },
 });

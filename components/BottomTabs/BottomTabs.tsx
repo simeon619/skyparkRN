@@ -16,7 +16,11 @@ export const BottomTabs = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { backgroundColor: '#fff', borderTopWidth: 1 },
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          // height: 50,
+          justifyContent: 'center',
+        },
         tabBarShowLabel: false,
       }}>
       <Tab.Screen

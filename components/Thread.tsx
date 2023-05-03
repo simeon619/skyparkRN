@@ -1,8 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import { FlashList } from '@shopify/flash-list';
 import React from 'react';
 import {
   Dimensions,
+  FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
   RefreshControl,
@@ -28,18 +28,16 @@ const Thread = ({
   let HEADER_HEIGHT = (RATIO_HEADER * height) / 100;
 
   return (
-    <FlashList
+    <FlatList
       data={POST_DATA}
-      estimatedItemSize={height / 2.2}
+      // estimatedItemSize={400}
       bounces={false}
       // refreshing={refreshing}
-      contentContainerStyle={
-        handleScrollHeader && {
-          paddingTop: HEADER_HEIGHT,
-          backgroundColor: '#fff8',
-          paddingBottom: 20,
-        }
-      }
+      contentContainerStyle={{
+        paddingTop: HEADER_HEIGHT,
+        backgroundColor: '#fff8',
+        paddingBottom: 20,
+      }}
       showsVerticalScrollIndicator={false}
       // onRefresh={() => setRefreshing(true)}
       onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -70,7 +68,7 @@ const Thread = ({
       // extraData={}
       keyExtractor={item => item.keyId}
       renderItem={({ item }) => (
-        <Postcomponent posts={item} navigation={navigation} key={item.keyId} />
+        <Postcomponent posts={item} navigation={navigation} />
       )}
     />
   );

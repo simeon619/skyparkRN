@@ -123,7 +123,10 @@ export const FormSignup = ({ navigation }: { navigation?: any }) => {
   }
 
   return (
-    <View style={styles.form}>
+    <View
+      style={styles.form}
+      // keyboardVerticalOffset={40}
+    >
       <Input2 name="code" control={control} icon={3} placeholder="CODE" />
       <Input2 name="email" control={control} placeholder="EMAIL" icon={1} />
       <Input2
@@ -172,8 +175,9 @@ export const FormSignup = ({ navigation }: { navigation?: any }) => {
 
 const styles = StyleSheet.create({
   form: {
-    alignItems: 'center',
+    // alignItems: 'center',
     padding: 10,
+    flex: 1,
   },
   descrText: {
     fontSize: 30,

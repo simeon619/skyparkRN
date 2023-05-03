@@ -32,28 +32,20 @@ export const Header = ({
             navigation.openDrawer();
           }}
           style={{ alignSelf: 'center' }}>
-          {User?.imgProfile ? (
-            <Image
-              style={styles.avatar}
-              resizeMode="contain"
-              source={
-                User.imgProfile[0]
-                  ? { uri: HOST + User.imgProfile[0] }
-                  : require('../assets/images/user.png')
-              }
-            />
-          ) : (
-            <Image
-              style={styles.avatar}
-              resizeMode="contain"
-              source={require('../assets/images/user.png')}
-            />
-          )}
+          <Image
+            style={styles.avatar}
+            resizeMode="contain"
+            source={
+              User.imgProfile[0]
+                ? { uri: HOST + User.imgProfile[0] }
+                : require('../assets/images/user.png')
+            }
+          />
         </Pressable>
         <Pressable onPress={() => {}} style={{ alignSelf: 'center' }}>
           <Text
             style={{
-              fontSize: width * 0.05,
+              fontSize: width * 0.07,
               color: 'black',
               fontFamily: 'Kurale-Regular',
               marginRight: 55,
@@ -68,7 +60,7 @@ export const Header = ({
           <Text
             style={[
               {
-                fontSize: 20,
+                fontSize: width * 0.052,
                 color: '#aaa',
                 fontWeight: '600',
                 fontFamily: 'Ubuntu-Regular',
@@ -90,7 +82,7 @@ export const Header = ({
           <Text
             style={[
               {
-                fontSize: 20,
+                fontSize: width * 0.052,
                 color: '#aaa',
                 fontWeight: '600',
                 paddingBottom: 8,

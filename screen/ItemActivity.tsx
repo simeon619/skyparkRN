@@ -17,7 +17,7 @@ import { HOST } from '../utils/metric';
 import { PropsNavigation } from '../utils/schemaType';
 import SQuery from '../utils/squery/SQueryClient';
 type ActivitySchema = {
-  channelId: string;
+  activityId: string;
   name: string;
   description: string;
   picture: string;
@@ -38,43 +38,30 @@ const ItemActivity = (props: PropsNavigation) => {
   let User = useSelector((state: any) => state.dataUser);
   const initInstance = async () => {
     const userId = User.userId;
-
     let model = await SQuery.Model('user');
-
     let user = await model.newInstance({ id: userId });
     let Quarter = await user.extractor('./account/address/quarter');
-
     let communityActivities = await Quarter.activities;
     (await communityActivities.page()).items.forEach(async (item: any) => {
-      console.log({ item }, 'kofdkfodkfodkfod');
       let activityModel = await SQuery.Model('activity');
       console.log({ activityModel }, 'activitymodel');
       let activity = await activityModel.newInstance({ id: item._id });
       console.log({ activity });
-      let channel = await activity.channel;
       let name = await activity.name;
       let description = await activity.description;
-      console.log({ channel, activity });
-
-      let id = await channel.$id;
       let poster = await activity.poster;
       let picture = (await poster.imgProfile)[0];
-      console.log({ picture });
-
-      let vectors = await channel.vectors;
-      await vectors.update({ paging: { sort: { createdAt: -1 } } });
       let Activity = {
-        channelId: id,
-        name,
+        activityId: item._id,
         description,
         picture,
+        name,
       };
       setActivities(prev => [...prev, Activity]);
     });
   };
 
   const ItemView = ({ itemActivity }: { itemActivity: ActivitySchema }) => {
-    console.log(itemActivity.picture);
     return (
       <View
         style={{
@@ -88,9 +75,7 @@ const ItemActivity = (props: PropsNavigation) => {
         <Pressable
           onPress={() => {
             navigation.getParent()?.navigate('Activity', {
-              nameActivity: itemActivity.name,
-              nameUser: User.name,
-              channelId: itemActivity.channelId,
+              activityId: itemActivity.activityId,
             });
           }}>
           <ImageBackground
@@ -173,7 +158,7 @@ const ItemActivity = (props: PropsNavigation) => {
         data={activities}
         showsVerticalScrollIndicator={false}
         estimatedItemSize={height / 5}
-        keyExtractor={item => item.channelId}
+        keyExtractor={item => item.activityId}
         renderItem={({ item }) => <ItemView itemActivity={item} />}
       />
     </View>

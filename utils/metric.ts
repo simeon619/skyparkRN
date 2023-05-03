@@ -7,11 +7,12 @@
 import { formatDistance } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { store } from '../wharehouse/store';
+import { PostSchema } from './posts';
 import SQuery from './squery/SQueryClient';
 
 // import React from 'react'
 export const RATIO_HEADER = 13;
-export const HOST = 'http://192.168.1.8:3500';
+export const HOST = 'http://192.168.1.5:3500';
 export type commentSchema = {
   time: string;
   name: string;
@@ -26,11 +27,7 @@ function useRedux(type: any, payload: any) {
   const dispatch = store.dispatch;
   dispatch({ type, payload });
 }
-export const InitPostComments = async (
-  id: string,
-  // setComments: any,
-  // setChannelPost: any,
-) => {
+export const InitPostComments = async (id: string) => {
   if (id in COMMENT_CACHE_RESULT) {
     console.log('IN_CACHE');
     return;
@@ -63,10 +60,9 @@ export const InitPostComments = async (
       urlArray = await file.url;
     }
     let resultCache = COMMENT_CACHE_RESULT[id].results;
-    let meltResult = resultCache.concat([
+    COMMENT_CACHE_RESULT[id].results = resultCache.concat([
       { name, picUser, like, commentaire, time, images: urlArray },
     ]);
-    COMMENT_CACHE_RESULT[id].results = meltResult;
 
     useRedux('comment/addComment', { ...COMMENT_CACHE_RESULT });
   });
@@ -106,10 +102,149 @@ export const InitPostComments = async (
     .filter((f: any) => !!f.value)
     .map((v: any) => v.value);
   COMMENT_CACHE_RESULT[id] = { results };
-
   useRedux('comment/addComment', { ...COMMENT_CACHE_RESULT });
 };
+export const COMMENT_CACHE_CHANNEL_ACTIVITY: any = {};
+const COMMENT_CACHE_RESULT_ACTIVITY: any = {};
+export async function initPostActivity(
+  nameActivity: string,
+  iconActivity: string,
+  vectorsChannelActivity: any,
+  idActivity: string,
+) {
+  if (idActivity in COMMENT_CACHE_RESULT_ACTIVITY) {
+    console.log('IN_CACHE');
+    return;
+  }
+  console.log('OUT_CACHE');
+  COMMENT_CACHE_CHANNEL_ACTIVITY[idActivity] = {
+    vectors: vectorsChannelActivity,
+  };
+  vectorsChannelActivity.when('update', async (item: any) => {
+    if (item.added.length === 0) {
+      return;
+    }
+    const Id = item.added[0];
+    let postModel = await SQuery.Model('post');
+    let post = await postModel.newInstance({ id: Id });
+    let message = await post.message;
+    let account = await message.account;
+    let name = await account.name;
+    const profile = await account.profile;
+    const imgProfile = (await profile.imgProfile)[0];
+    let text = await message.text;
+    const file = await message.file;
+    let urlArray;
+    if (file) {
+      urlArray = await file.url;
+    }
+    const date = new Date(await message.createdAt);
+    const timestamp = date.getTime().toString();
+    const like: number = await new Promise(res => {
+      SQuery.emit('post:like', { postId: Id }, (result: any) => {
+        if (result.error) {
+          return res(0);
+        }
+        res(result.response);
+      });
+    });
+    const accountId = account.$id;
+    const randomCommentAuthorId = Math.floor(
+      Math.random() * 1000000000000,
+    ).toString();
+    let meltResult = COMMENT_CACHE_RESULT_ACTIVITY[idActivity].results;
 
+    COMMENT_CACHE_RESULT_ACTIVITY[idActivity].results = meltResult.concat([
+      {
+        id: Id,
+        keyId: randomCommentAuthorId,
+        author: {
+          id: accountId,
+          name,
+          picture: imgProfile ? imgProfile : '',
+        },
+        content: text,
+        iconActivity,
+        nameActivity,
+        images: urlArray,
+        likes: like,
+        timestamp,
+      },
+    ]);
+    useRedux('postQuarter/addPostQuarter', {
+      ...COMMENT_CACHE_RESULT_ACTIVITY,
+    });
+  });
+  let data = await vectorsChannelActivity.update({
+    paging: { sort: { createdAt: 1 } },
+  });
+  let results: PostSchema[] = (
+    await getNewData(data, iconActivity, nameActivity)
+  )
+    .filter(p => !!p.value)
+    .map(p => p.value);
+  COMMENT_CACHE_RESULT_ACTIVITY[idActivity] = {
+    results,
+    icon: iconActivity,
+    name: nameActivity,
+  };
+
+  useRedux('postQuarter/addPostQuarter', {
+    ...COMMENT_CACHE_RESULT_ACTIVITY,
+  });
+}
+async function getNewData(
+  data: any,
+  iconActivity: string,
+  nameActivity: string,
+): Promise<any[]> {
+  return await Promise.allSettled(
+    data.items.map(async (item: any) => {
+      const Id = item._id;
+      const postModel = await SQuery.Model('post');
+      const post = await postModel.newInstance({ id: Id });
+      const message = await post.message;
+      const account = await message.account;
+      const name = await account.name;
+      const text = await message.text;
+      const profile = await account.profile;
+      const imgProfile = (await profile.imgProfile)[0];
+      const file = await message.file;
+      let urlArray;
+      if (file) {
+        urlArray = await file.url;
+      }
+      const like: number = await new Promise(res => {
+        SQuery.emit('post:like', { postId: Id }, (result: any) => {
+          if (result.error) {
+            return res(0);
+          }
+          res(result.response);
+        });
+      });
+      const date = new Date(await message.createdAt);
+      const timestamp = date.getTime().toString();
+      const accountId = account.$id;
+      const KeyId = Math.floor(Math.random() * 1000000000000).toString();
+      const postGet: PostSchema = {
+        id: Id,
+        keyId: KeyId,
+        author: {
+          id: accountId,
+          name,
+          picture: imgProfile ? imgProfile : '',
+        },
+        iconActivity,
+        nameActivity,
+        content: text,
+        images: urlArray,
+        likes: like,
+        timestamp,
+      };
+      return postGet;
+    }),
+  );
+}
 // const COMMENT_CAHE_LIMIT: any = {};
 // export const initLimitComment = async (id: string, setCommentLimit: any) => {
 //   if (id in COMMENT_CAHE_LIMIT) {

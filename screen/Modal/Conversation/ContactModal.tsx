@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Dimensions,
   Image,
@@ -16,11 +17,25 @@ import { useSelector } from 'react-redux';
 import ContactsComponent from '../../../components/Conversations/ContactsComponent';
 import { COLORS } from '../../../themes/colors';
 import SQuery from '../../../utils/squery/SQueryClient';
+import { store } from '../../../wharehouse/store';
 const { width } = Dimensions.get('window');
-
+function useRedux(type: any, payload: any) {
+  const dispatch = store.dispatch;
+  dispatch({ type, payload });
+}
+export type contactShema = {
+  timestamp: string;
+  nameUser: string;
+  message: string;
+  picUser: string;
+  id: string;
+};
 const Contact = ({ navigation }: { navigation: any }) => {
-  let [listContact, setListContact] = useState<any[]>([]);
+  // let [listContact, setListContact] = useState<any[]>([]);
   const User = useSelector((state: any) => state.dataUser);
+  const listContact: contactShema[] = useSelector(
+    (state: any) => state.contact,
+  );
   useEffect(() => {
     getInfoUser();
   }, []);
@@ -79,7 +94,8 @@ const Contact = ({ navigation }: { navigation: any }) => {
       .filter((p: any) => !!p?.value)
       .map((p: any) => p.value);
 
-    setListContact(prev => [...prev, ...userList]);
+    // setListContact(prev => [...prev, ...userList]);
+    useRedux('contact/addConatct', [...userList]);
   };
   return (
     <View>

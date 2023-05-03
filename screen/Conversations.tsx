@@ -15,6 +15,7 @@ import { useSelector } from 'react-redux';
 import UserConversation from '../components/Conversations/UserConversationComponent';
 import SQuery from '../utils/squery/SQueryClient';
 export type listUserSchema = {
+  discussionId: string;
   id: string;
   nameUser: string;
   picUser: string;
@@ -25,132 +26,18 @@ export type listUserSchema = {
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const Conversation = ({ navigation }: { navigation: any }) => {
   const User = useSelector((state: any) => state.dataUser);
-  const [contacts, setContacts] = useState<any[]>([]);
+  const [contacts, setContacts] = useState<listUserSchema[]>([]);
   useEffect(() => {
     getContact();
   }, []);
   const refreshList = (etat: any) => {
     setContacts(prev => [...etat, ...prev]);
   };
-  // const listUser: listUserSchema[] = [
-  //   {
-  //     timestamp: Date.now().toString(),
-  //     id: '326256',
-  //     nameUser: 'Messsah Komlan simeon de las carasse',
-  //     picUser:
-  //       'https://images.pexels.com/photos/15302394/pexels-photo-15302394.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
-  //     typeMessage: {
-  //       text: 'salut les gars je suys hereux de fait de ca notre utilitaire pricinpale',
-  //       video:
-  //         'https://joy1.videvo.net/videvo_files/video/free/video0474/large_watermarked/_import_61e8f017b3b2c5.29118448_preview.mp4',
-  //       pdf: 'https://profdoc.iddocs.fr/IMG/pdf/billiejoe_javascript_fiches.pdf',
-  //     },
-  //   },
-  //   {
-  //     timestamp: Date.now().toString(),
-  //     id: '42656',
-  //     nameUser: 'Daniel',
-  //     picUser:
-  //       'https://images.pexels.com/photos/15302394/pexels-photo-15302394.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
-  //     typeMessage: {
-  //       text: 'salut les gars',
-  //       video:
-  //         'https://joy1.videvo.net/videvo_files/video/free/video0474/large_watermarked/_import_61e8f017b3b2c5.29118448_preview.mp4',
-  //       pdf: 'https://profdoc.iddocs.fr/IMG/pdf/billiejoe_javascript_fiches.pdf',
-  //     },
-  //   },
-  //   {
-  //     timestamp: Date.now().toString(),
-  //     id: '565465',
-  //     nameUser: 'young maman',
-  //     picUser:
-  //       'https://images.pexels.com/photos/15302394/pexels-photo-15302394.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
-  //     typeMessage: {
-  //       text: 'salut les gars 4',
-  //       video:
-  //         'https://joy1.videvo.net/videvo_files/video/free/video0474/large_watermarked/_import_61e8f017b3b2c5.29118448_preview.mp4',
-  //       pdf: 'https://profdoc.iddocs.fr/IMG/pdf/billiejoe_javascript_fiches.pdf',
-  //     },
-  //   },
-  //   {
-  //     timestamp: Date.now().toString(),
-  //     id: '66532',
-  //     nameUser: 'Young papa',
-  //     picUser:
-  //       'https://images.pexels.com/photos/14251082/pexels-photo-14251082.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
-  //     typeMessage: {
-  //       text: 'salut les gars 2',
-  //       video:
-  //         'https://joy1.videvo.net/videvo_files/video/free/video0474/large_watermarked/_import_61e8f017b3b2c5.29118448_preview.mp4',
-  //       pdf: 'https://profdoc.iddocs.fr/IMG/pdf/billiejoe_javascript_fiches.pdf',
-  //     },
-  //   },
-  //   {
-  //     timestamp: Date.now().toString(),
-  //     id: '454564564',
-  //     nameUser: 'Young papa',
-  //     picUser:
-  //       'https://images.pexels.com/photos/14251082/pexels-photo-14251082.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
-  //     typeMessage: {
-  //       text: 'salut les gars 2',
-  //       video:
-  //         'https://joy1.videvo.net/videvo_files/video/free/video0474/large_watermarked/_import_61e8f017b3b2c5.29118448_preview.mp4',
-  //       pdf: 'https://profdoc.iddocs.fr/IMG/pdf/billiejoe_javascript_fiches.pdf',
-  //     },
-  //   },
-  //   {
-  //     timestamp: Date.now().toString(),
-  //     id: '687',
-  //     nameUser: 'Young papa',
-  //     picUser:
-  //       'https://images.pexels.com/photos/15302394/pexels-photo-15302394.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
-  //     typeMessage: {
-  //       text: 'salut les gars 2',
-  //       video:
-  //         'https://joy1.videvo.net/videvo_files/video/free/video0474/large_watermarked/_import_61e8f017b3b2c5.29118448_preview.mp4',
-  //       pdf: 'https://profdoc.iddocs.fr/IMG/pdf/billiejoe_javascript_fiches.pdf',
-  //     },
-  //   },
-  //   {
-  //     timestamp: Date.now().toString(),
-  //     id: '146',
-  //     nameUser: 'Young papa',
-  //     picUser:
-  //       'https://images.pexels.com/photos/15791536/pexels-photo-15791536.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
-  //     typeMessage: {
-  //       text: 'salut les gars 2',
-  //       video:
-  //         'https://joy1.videvo.net/videvo_files/video/free/video0474/large_watermarked/_import_61e8f017b3b2c5.29118448_preview.mp4',
-  //       pdf: 'https://profdoc.iddocs.fr/IMG/pdf/billiejoe_javascript_fiches.pdf',
-  //     },
-  //   },
-  //   {
-  //     timestamp: Date.now().toString(),
-  //     id: '16',
-  //     nameUser: 'Young papa',
-  //     picUser:
-  //       'https://images.pexels.com/photos/15302394/pexels-photo-15302394.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
-  //     typeMessage: {
-  //       text: 'salut les gars 2',
-  //       video:
-  //         'https://joy1.videvo.net/videvo_files/video/free/video0474/large_watermarked/_import_61e8f017b3b2c5.29118448_preview.mp4',
-  //       pdf: 'https://profdoc.iddocs.fr/IMG/pdf/billiejoe_javascript_fiches.pdf',
-  //     },
-  //   },
-  //   {
-  //     timestamp: Date.now().toString(),
-  //     id: '62',
-  //     nameUser: 'Young papa',
-  //     picUser:
-  //       'https://images.pexels.com/photos/15302394/pexels-photo-15302394.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
-  //     typeMessage: {
-  //       text: 'salut les gars 2',
-  //       video:
-  //         'https://joy1.videvo.net/videvo_files/video/free/video0474/large_watermarked/_import_61e8f017b3b2c5.29118448_preview.mp4',
-  //       pdf: 'https://profdoc.iddocs.fr/IMG/pdf/billiejoe_javascript_fiches.pdf',
-  //     },
-  //   },
-  // ];
+  const refreshListRemoved = (id: string) => {
+    setContacts(prev => {
+      return prev.filter(disc => disc.discussionId !== id);
+    });
+  };
   const getContact = async () => {
     const userMessenger = await SQuery.Model('messenger');
 
@@ -162,54 +49,54 @@ const Conversation = ({ navigation }: { navigation: any }) => {
     (await MessengerInstance.listDiscussion).when(
       'update',
       async (data: any) => {
-        if (!data.added[0]) {
-          console.log('NULL');
-          return;
-        }
-        console.log(
-          '*********************REFRESHING***************************',
-        );
+        if (data.added[0]) {
+          console.log(
+            '*********************REFRESHING***************************',
+            { data },
+          );
 
-        const discussionModel = await SQuery.Model('discussion');
-        console.log({ discussionModel });
-
-        const discussionInstance = await discussionModel.newInstance({
-          id: data.added[0],
-        });
-        console.log({ discussionInstance });
-        const channel = await discussionInstance.channel;
-        const receiver = await discussionInstance.receiver;
-        const sender = await discussionInstance.sender;
-        const contactAccount =
-          sender.$id === User.accountId ? receiver : sender;
-        let profile = await contactAccount.profile;
-        let nameUser = await contactAccount.name;
-        let picUser = (await profile.imgProfile)[0];
-        refreshList([
-          {
-            id: contactAccount.$id,
-            picUser,
-            nameUser,
-            timestamp: Date.now().toString(),
-            lastMessage: 'salut',
-            idChannel: channel.$id,
-          },
-        ]);
-        if (User.userId !== sender.$id) {
-          return;
-        }
-        const userContact = await contactAccount.newParentInstance();
-        const discussions = (await userContact.messenger).listDiscussion;
-        await discussions.update({
-          addNew: [
+          const discussionModel = await SQuery.Model('discussion');
+          const discussionInstance = await discussionModel.newInstance({
+            id: data.added[0],
+          });
+          console.log({ discussionInstance });
+          const channel = await discussionInstance.channel;
+          const receiver = await discussionInstance.receiver;
+          const sender = await discussionInstance.sender;
+          const contactAccount =
+            sender.$id === User.accountId ? receiver : sender;
+          let profile = await contactAccount.profile;
+          let nameUser = await contactAccount.name;
+          let picUser = (await profile.imgProfile)[0];
+          refreshList([
             {
-              channel: channel.$id,
-              sender: User.accountId,
-              receiver: receiver.$id,
+              id: contactAccount.$id,
+              picUser,
+              discussionId: discussionInstance.$id,
+              nameUser,
+              timestamp: Date.now().toString(),
+              lastMessage: 'salut',
+              idChannel: channel.$id,
             },
-          ],
-          paging: { sort: { createdAt: -1 } },
-        });
+          ]);
+          if (User.userId !== sender.$id) {
+            return;
+          }
+          const userContact = await contactAccount.newParentInstance();
+          const discussions = (await userContact.messenger).listDiscussion;
+          await discussions.update({
+            addNew: [
+              {
+                channel: channel.$id,
+                sender: User.accountId,
+                receiver: receiver.$id,
+              },
+            ],
+            paging: { sort: { createdAt: -1 } },
+          });
+        } else if (data.removed[0]) {
+          refreshListRemoved(data.removed[0]);
+        }
       },
     );
 
@@ -217,6 +104,8 @@ const Conversation = ({ navigation }: { navigation: any }) => {
       await (await MessengerInstance.listDiscussion).page()
     ).items.map((discussion: any) => {
       return new Promise(async res => {
+        console.log({ discussion });
+
         const contactAccountId =
           discussion.sender === User.accountId
             ? discussion.receiver
@@ -232,6 +121,7 @@ const Conversation = ({ navigation }: { navigation: any }) => {
 
         res({
           id: contactAccount.$id,
+          discussionId: discussion._id,
           picUser,
           nameUser,
           timestamp: Date.now().toString(),
@@ -249,7 +139,12 @@ const Conversation = ({ navigation }: { navigation: any }) => {
 
   return (
     <SafeAreaView
-      style={{ width, height: SCREEN_HEIGHT, backgroundColor: 'white' }}>
+      style={{
+        width,
+        height: SCREEN_HEIGHT,
+        backgroundColor: 'white',
+        marginTop: StatusBar.currentHeight,
+      }}>
       <StatusBar backgroundColor={'#fff'} barStyle={'dark-content'} />
       <View
         style={{

@@ -13,6 +13,7 @@ import {
   FlatList,
   Image,
   Keyboard,
+  Platform,
   Pressable,
   StatusBar,
   Text,
@@ -28,6 +29,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { KeyboardInsetsView } from 'react-native-keyboard-insets';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { PostItem } from '../../components/Post/Postcomponent';
 import { COLORS } from '../../themes/colors';
@@ -40,12 +43,12 @@ const DetailPost = ({ route, navigation }: { route: any; navigation: any }) => {
   const [text, setText] = useState('');
   const [channelPost, setChannelPost] = useState<any>(null);
   const [uri, setUri] = useState('');
+  const [lastHeightComment, setLastHeightComment] = useState<number>(0);
   const User = useSelector((state: any) => state.dataUser);
-
+  console.log({ lastHeightComment });
   const Comments = useSelector((state: any) => state.commentPost);
 
-  let showComment = Comments[route.params.id].results;
-  const Commen = useSelector((state: any) => state.commentPost);
+  let showComment = Comments[route.params.id]?.results;
   const height = useSharedValue(0);
   const handleContentSizeChange = useCallback((event: any) => {
     const newHeight = event.nativeEvent.contentSize.height;
@@ -57,7 +60,7 @@ const DetailPost = ({ route, navigation }: { route: any; navigation: any }) => {
       maxHeight: HS * 0.15,
     };
   });
-  console.log({ Commen });
+  console.log({ Comments });
 
   const chooseImage = () => {
     ImagePicker.openPicker({})
@@ -108,7 +111,7 @@ const DetailPost = ({ route, navigation }: { route: any; navigation: any }) => {
       console.log(error);
     }
   };
-  const offset = useSharedValue(HS * 0.06);
+  const offset = useSharedValue(HS * 0.041);
 
   const offsetAnime = useAnimatedStyle(() => {
     return {
@@ -120,7 +123,7 @@ const DetailPost = ({ route, navigation }: { route: any; navigation: any }) => {
       offset.value = withTiming(0);
     });
     Keyboard.addListener('keyboardDidHide', Kevent => {
-      offset.value = withTiming(HS * 0.06);
+      offset.value = withTiming(HS * 0.041);
     });
   }, []);
   const scrollViewRef = useRef<FlatList>(null);
@@ -130,7 +133,12 @@ const DetailPost = ({ route, navigation }: { route: any; navigation: any }) => {
   }, [Comments]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#eee' }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: '#eee',
+        marginTop: StatusBar.currentHeight,
+      }}>
       <StatusBar backgroundColor={'#eee'} barStyle={'dark-content'} />
       <View
         style={{
@@ -150,7 +158,7 @@ const DetailPost = ({ route, navigation }: { route: any; navigation: any }) => {
           />
           <Text style={{ fontSize: 20, color: 'black' }}>
             {' '}
-            {/* {Comments?.length}{' '} */}
+            {Comments?.length}{' '}
           </Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -161,10 +169,18 @@ const DetailPost = ({ route, navigation }: { route: any; navigation: any }) => {
           <Text style={{ fontSize: 20, color: 'black' }}> 0 </Text>
         </View>
       </View>
+
       <FlatList
         data={showComment}
-        renderItem={({ item, index }) => <PostItem item={item} i={index} />}
+        renderItem={({ item, index }) => (
+          <PostItem
+            item={item}
+            i={index}
+            setLastHeightComment={setLastHeightComment}
+          />
+        )}
         keyExtractor={(item, index) => index.toString()}
+        keyboardShouldPersistTaps={'always'}
         ref={scrollViewRef}
         onContentSizeChange={() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -178,6 +194,7 @@ const DetailPost = ({ route, navigation }: { route: any; navigation: any }) => {
         inverted={true}
         ListHeaderComponent={<View style={{ height: HS * 0.07 }} />}
       />
+
       <Animated.View
         style={[
           {
@@ -188,117 +205,122 @@ const DetailPost = ({ route, navigation }: { route: any; navigation: any }) => {
           },
           offsetAnime,
         ]}>
-        {!!uri && (
-          <View style={{ alignItems: 'center', marginVertical: 5 }}>
-            <Image
-              style={{ width: width * 0.7, height: width * 0.4 }}
-              source={{ uri }}
-              resizeMode="cover"
-            />
-          </View>
-        )}
-        <Animated.View
-          style={[
-            {
-              // width: width,
-              borderColor: 'black',
-              borderWidth: 0.1,
-              borderRadius: 20,
-              backgroundColor: '#fff0',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              width: width * 0.9,
-              marginLeft: 20,
-            },
-            animatedStyles,
-          ]}>
-          <TextInput
-            ref={inputRef}
-            onChangeText={setText}
-            placeholder="Your comment..."
-            placeholderTextColor="grey"
-            value={text}
-            multiline={true}
-            autoFocus={route.params.showKeyBoard}
-            scrollEnabled={true}
-            focusable={true}
-            onContentSizeChange={handleContentSizeChange}
-            style={{
-              fontSize: width * 0.05,
-              color: '#444',
-              backgroundColor: '#fff',
-              fontFamily: 'Ubuntu-Regular',
-              paddingHorizontal: width * 0.05,
-              // paddingVertical: width * 0.03,
-              // marginTop: 2,
-              borderRadius: 10,
-              width: '100%',
-            }}
-          />
-        </Animated.View>
+        <KeyboardInsetsView style={{}} extraHeight={40}>
+          {!!uri && (
+            <View style={{ alignItems: 'center', marginVertical: 5 }}>
+              <Image
+                style={{ width: width * 0.7, height: width * 0.4 }}
+                source={{ uri }}
+                resizeMode="cover"
+              />
+            </View>
+          )}
+          <Animated.View
+            style={[
+              {
+                // width: width,
+                borderColor: 'black',
+                borderWidth: 0.1,
+                borderRadius: 20,
+                backgroundColor: 'red',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                width: width * 0.9,
+                marginLeft: 20,
+                // marginVertical: 5,
+              },
+              animatedStyles,
+            ]}>
+            <TextInput
+              ref={inputRef}
+              onChangeText={setText}
+              placeholder="Your comment..."
+              placeholderTextColor="grey"
+              value={text}
+              multiline={true}
+              autoFocus={route.params.showKeyBoard}
+              scrollEnabled={true}
+              focusable={true}
+              onContentSizeChange={handleContentSizeChange}
+              style={{
+                fontSize: width * 0.05,
+                color: '#444',
+                backgroundColor: '#fff',
+                fontFamily: 'Ubuntu-Regular',
+                paddingHorizontal: width * 0.05,
+                borderRadius: 10,
 
-        <View
-          style={[
-            {
-              justifyContent: 'space-between',
-              alignItems: 'baseline',
-              flexDirection: 'row',
-              width,
-              // gap: width * 0.5,
-              backgroundColor: '#ebeaea',
-            },
-          ]}>
+                width: '100%',
+              }}
+            />
+          </Animated.View>
+
           <View
             style={[
               {
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
                 flexDirection: 'row',
-                gap: width * 0.04,
-                paddingLeft: width * 0.02,
-                paddingVertical: width * 0.025,
+                width,
+                // gap: width * 0.5,
+                backgroundColor: '#ebeaea',
               },
             ]}>
-            <Pressable
-              onPress={() => {
-                chooseImage();
-              }}>
+            <View
+              style={[
+                {
+                  flexDirection: 'row',
+                  gap: width * 0.04,
+                  paddingLeft: width * 0.02,
+                  paddingBottom: width * 0.05,
+                },
+              ]}>
+              <Pressable
+                onPress={() => {
+                  chooseImage();
+                }}>
+                <Image
+                  style={{
+                    width: width * 0.07,
+                    height: width * 0.07,
+                    tintColor: '#777',
+                  }}
+                  source={require('../../assets/images/camera_post.png')}
+                />
+              </Pressable>
+
               <Image
                 style={{
                   width: width * 0.07,
                   height: width * 0.07,
                   tintColor: '#777',
                 }}
-                source={require('../../assets/images/camera_post.png')}
+                source={require('../../assets/images/gif.png')}
+              />
+              <Image
+                style={{ width: width * 0.07, height: width * 0.07 }}
+                source={require('../../assets/images/smile_post.png')}
+              />
+            </View>
+            <Pressable style={[{ paddingRight: 15 }]} onPress={() => send()}>
+              <Image
+                style={[
+                  {
+                    width: width * 0.08,
+                    height: width * 0.08,
+                    tintColor: COLORS.blue,
+                  },
+                  !text && { tintColor: 'grey' },
+                ]}
+                source={require('../../assets/images/send_post.png')}
               />
             </Pressable>
-
-            <Image
-              style={{
-                width: width * 0.07,
-                height: width * 0.07,
-                tintColor: '#777',
-              }}
-              source={require('../../assets/images/gif.png')}
-            />
-            <Image
-              style={{ width: width * 0.07, height: width * 0.07 }}
-              source={require('../../assets/images/smile_post.png')}
-            />
           </View>
-          <Pressable style={[{ paddingRight: 15 }]} onPress={() => send()}>
-            <Image
-              style={[
-                {
-                  width: width * 0.08,
-                  height: width * 0.08,
-                  tintColor: COLORS.blue,
-                },
-                !text && { tintColor: 'grey' },
-              ]}
-              source={require('../../assets/images/send_post.png')}
-            />
-          </Pressable>
-        </View>
+        </KeyboardInsetsView>
       </Animated.View>
+      {Platform.OS === 'android' && (
+        <SafeAreaView mode="padding" edges={['bottom']} />
+      )}
     </View>
   );
 };
